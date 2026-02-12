@@ -1,3 +1,6 @@
+[![codecov](https://codecov.io/gh/sitepark/ies-userrepository-core/graph/badge.svg?token=eRLHR95gFb)](https://codecov.io/gh/sitepark/ies-userrepository-core)
+[![Known Vulnerabilities](https://snyk.io/test/github/sitepark/ies-label-core/badge.svg)](https://snyk.io/test/github/sitepark/ies-label-core/)
+
 # IES Label Core
 
 A domain-agnostic label management library for the IES system that enables flexible categorization and marking of entities.
