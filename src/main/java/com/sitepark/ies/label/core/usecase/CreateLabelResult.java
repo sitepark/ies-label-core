@@ -16,4 +16,7 @@ import org.jetbrains.annotations.NotNull;
  * @param timestamp the exact moment when the label was created
  */
 public record CreateLabelResult(
-    @NotNull String labelId, @NotNull LabelSnapshot snapshot, @NotNull Instant timestamp) {}
+    @NotNull String labelId,
+    @NotNull LabelSnapshot snapshot,
+    @NotNull AssignScopesToLabelsResult scopeAssignmentResult,
+    @NotNull Instant timestamp) {}

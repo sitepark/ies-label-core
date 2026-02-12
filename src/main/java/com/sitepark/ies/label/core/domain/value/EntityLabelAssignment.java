@@ -44,12 +44,8 @@ public class EntityLabelAssignment {
     return this.assignments.isEmpty();
   }
 
-  public int countAssignments() {
-    return this.assignments.values().stream().mapToInt(Set::size).sum();
-  }
-
   public int size() {
-    return this.assignments.size();
+    return this.assignments.values().stream().mapToInt(Set::size).sum();
   }
 
   @Override

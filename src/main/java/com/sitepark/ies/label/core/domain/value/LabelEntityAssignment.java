@@ -45,7 +45,7 @@ public class LabelEntityAssignment {
   }
 
   public int size() {
-    return this.assignments.size();
+    return this.assignments.values().stream().mapToInt(Set::size).sum();
   }
 
   @Override

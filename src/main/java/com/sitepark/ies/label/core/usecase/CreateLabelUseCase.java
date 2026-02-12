@@ -1,6 +1,7 @@
 package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.entity.Label;
+import com.sitepark.ies.label.core.domain.value.LabelScopeAssignment;
 import com.sitepark.ies.label.core.domain.value.LabelSnapshot;
 import com.sitepark.ies.label.core.port.AuthorizationService;
 import com.sitepark.ies.label.core.port.LabelRepository;
@@ -59,14 +60,21 @@ public final class CreateLabelUseCase {
     Instant timestamp = Instant.now(this.clock);
     String labelId = this.repository.create(request.label());
 
+    AssignScopesToLabelsResult scopeReassignmentResult;
+
     List<String> scopeIds = request.scopes();
     if (!scopeIds.isEmpty()) {
       this.scopeAssigner.assignScopesToLabels(List.of(labelId), scopeIds);
+      scopeReassignmentResult =
+          AssignScopesToLabelsResult.assigned(
+              LabelScopeAssignment.builder().assignments(labelId, scopeIds).build(), timestamp);
+    } else {
+      scopeReassignmentResult = AssignScopesToLabelsResult.skipped();
     }
 
     Label createdLabel = this.repository.get(labelId).orElseThrow();
     LabelSnapshot snapshot = new LabelSnapshot(createdLabel, scopeIds);
 
-    return new CreateLabelResult(labelId, snapshot, timestamp);
+    return new CreateLabelResult(labelId, snapshot, scopeReassignmentResult, timestamp);
   }
 }
