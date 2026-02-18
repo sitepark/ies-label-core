@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>The {@link Assigned} variant contains assignment information that can be used for audit
  * logging or tracking which entities were assigned to which labels.
  */
-public sealed interface AssignEntitiesToLabelsResult {
+public sealed interface AssignLabelsToEntitiesResult {
 
   /**
    * Gets the entity-label assignments.
@@ -34,7 +34,7 @@ public sealed interface AssignEntitiesToLabelsResult {
    * @param timestamp the timestamp when the assignment occurred
    */
   record Assigned(@NotNull LabelEntityAssignment assignments, @NotNull Instant timestamp)
-      implements AssignEntitiesToLabelsResult {}
+      implements AssignLabelsToEntitiesResult {}
 
   /**
    * Result when the entities assignment was skipped.
@@ -42,7 +42,7 @@ public sealed interface AssignEntitiesToLabelsResult {
    * @param assignments empty assignments (no effective changes)
    */
   record Skipped(@NotNull LabelEntityAssignment assignments)
-      implements AssignEntitiesToLabelsResult {
+      implements AssignLabelsToEntitiesResult {
     /** Creates a Skipped result with empty assignments. */
     public Skipped() {
       this(LabelEntityAssignment.builder().build());
@@ -56,7 +56,7 @@ public sealed interface AssignEntitiesToLabelsResult {
    * @param timestamp the assignment timestamp
    * @return assigned result
    */
-  static AssignEntitiesToLabelsResult assigned(
+  static AssignLabelsToEntitiesResult assigned(
       @NotNull LabelEntityAssignment assignments, @NotNull Instant timestamp) {
     return new Assigned(assignments, timestamp);
   }
@@ -66,7 +66,7 @@ public sealed interface AssignEntitiesToLabelsResult {
    *
    * @return skipped result with empty assignments
    */
-  static AssignEntitiesToLabelsResult skipped() {
+  static AssignLabelsToEntitiesResult skipped() {
     return new Skipped();
   }
 

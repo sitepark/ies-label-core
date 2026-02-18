@@ -12,22 +12,18 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-@JsonDeserialize(builder = UnassignEntitiesFromLabelsRequest.Builder.class)
+@JsonDeserialize(builder = AssignLabelsToEntitiesRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
-public final class UnassignEntitiesFromLabelsRequest {
+public class AssignLabelsToEntitiesRequest {
 
   @NotNull private final List<EntityRef> entityRefs;
 
   @NotNull private final List<Identifier> labelIdentifiers;
 
-  @Nullable private final String auditParentId;
-
-  private UnassignEntitiesFromLabelsRequest(Builder builder) {
+  protected AssignLabelsToEntitiesRequest(Builder builder) {
     this.entityRefs = List.copyOf(builder.entityRefs);
     this.labelIdentifiers = List.copyOf(builder.labelIdentifiers);
-    this.auditParentId = builder.auditParentId;
   }
 
   public boolean isEmpty() {
@@ -46,37 +42,29 @@ public final class UnassignEntitiesFromLabelsRequest {
     return this.labelIdentifiers;
   }
 
-  public String auditParentId() {
-    return this.auditParentId;
-  }
-
   public Builder toBuilder() {
     return new Builder(this);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.labelIdentifiers, this.entityRefs, this.auditParentId);
+    return Objects.hash(this.labelIdentifiers, this.entityRefs);
   }
 
   @Override
   public boolean equals(Object o) {
-    return (o instanceof UnassignEntitiesFromLabelsRequest that)
+    return (o instanceof AssignLabelsToEntitiesRequest that)
         && Objects.equals(this.entityRefs, that.entityRefs)
-        && Objects.equals(this.labelIdentifiers, that.labelIdentifiers)
-        && Objects.equals(this.auditParentId, that.auditParentId);
+        && Objects.equals(this.labelIdentifiers, that.labelIdentifiers);
   }
 
   @Override
   public String toString() {
-    return "UnassignEntitiesFromLabelsRequest{"
+    return "AssignPrivilegesToRolesRequest{"
         + ", entityRefs="
         + entityRefs
         + "labelIdentifiers="
         + labelIdentifiers
-        + ", auditParentId='"
-        + auditParentId
-        + '\''
         + '}';
   }
 
@@ -85,14 +73,12 @@ public final class UnassignEntitiesFromLabelsRequest {
 
     private final Set<EntityRef> entityRefs = new TreeSet<>();
     private final Set<Identifier> labelIdentifiers = new TreeSet<>();
-    private String auditParentId;
 
     private Builder() {}
 
-    private Builder(UnassignEntitiesFromLabelsRequest request) {
+    private Builder(AssignLabelsToEntitiesRequest request) {
       this.entityRefs.addAll(request.entityRefs);
       this.labelIdentifiers.addAll(request.labelIdentifiers);
-      this.auditParentId = request.auditParentId;
     }
 
     public Builder entityRefs(Consumer<ListBuilder<EntityRef>> configurer) {
@@ -111,13 +97,8 @@ public final class UnassignEntitiesFromLabelsRequest {
       return this;
     }
 
-    public Builder auditParentId(String auditParentId) {
-      this.auditParentId = auditParentId;
-      return this;
-    }
-
-    public UnassignEntitiesFromLabelsRequest build() {
-      return new UnassignEntitiesFromLabelsRequest(this);
+    public AssignLabelsToEntitiesRequest build() {
+      return new AssignLabelsToEntitiesRequest(this);
     }
   }
 }

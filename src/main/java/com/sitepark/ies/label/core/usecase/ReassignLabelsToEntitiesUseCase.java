@@ -39,10 +39,6 @@ public final class ReassignLabelsToEntitiesUseCase {
   public ReassignLabelsToEntitiesResult reassignLabelsToEntities(
       ReassignLabelsToEntitiesRequest request) {
 
-    if (request.isEmpty()) {
-      return ReassignLabelsToEntitiesResult.skipped();
-    }
-
     List<String> labelIds =
         IdentifierResolver.create(this.repository).resolve(request.labelIdentifiers());
 

@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  * <p><b>Permission Required:</b> Entity Write Access ({@link
  * AuthorizationService#isLabelAssignable(List)})
  */
-public final class AssignEntitiesToLabelsUseCase {
+public final class AssignLabelsToEntitiesUseCase {
 
   private static final Logger LOGGER = LogManager.getLogger();
   private final LabelRepository repository;
@@ -34,7 +34,7 @@ public final class AssignEntitiesToLabelsUseCase {
   private final Clock clock;
 
   @Inject
-  AssignEntitiesToLabelsUseCase(
+  AssignLabelsToEntitiesUseCase(
       LabelRepository repository,
       LabelEntityAssigner labelAssigner,
       AuthorizationService accessControl,
@@ -54,11 +54,11 @@ public final class AssignEntitiesToLabelsUseCase {
    * @throws AccessDeniedException if the user is not allowed to assign labels to entities
    */
   @NotNull
-  public AssignEntitiesToLabelsResult assignEntitiesToLabels(
-      @NotNull AssignEntitiesToLabelsRequest request) {
+  public AssignLabelsToEntitiesResult assignEntitiesToLabels(
+      @NotNull AssignLabelsToEntitiesRequest request) {
 
     if (request.isEmpty()) {
-      return AssignEntitiesToLabelsResult.skipped();
+      return AssignLabelsToEntitiesResult.skipped();
     }
 
     List<String> labelIds =
@@ -79,14 +79,14 @@ public final class AssignEntitiesToLabelsUseCase {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("no effective assignments found, skipping");
       }
-      return AssignEntitiesToLabelsResult.skipped();
+      return AssignLabelsToEntitiesResult.skipped();
     }
 
     this.labelEntityAssigner.assignEntitiesToLabels(labelIds, request.entityRefs());
 
     Instant timestamp = Instant.now(this.clock);
 
-    return AssignEntitiesToLabelsResult.assigned(effectiveAssignments, timestamp);
+    return AssignLabelsToEntitiesResult.assigned(effectiveAssignments, timestamp);
   }
 
   private LabelEntityAssignment effectiveAssignments(

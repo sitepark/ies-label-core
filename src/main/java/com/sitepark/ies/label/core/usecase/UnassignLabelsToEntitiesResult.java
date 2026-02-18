@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>The {@link Unassigned} variant contains unassignment information that can be used for audit
  * logging or tracking which entities were unassigned from which labels.
  */
-public sealed interface UnassignEntitiesToLabelsResult {
+public sealed interface UnassignLabelsToEntitiesResult {
 
   /**
    * Gets the entity-label unassignments.
@@ -34,7 +34,7 @@ public sealed interface UnassignEntitiesToLabelsResult {
    * @param timestamp the timestamp when the unassignment occurred
    */
   record Unassigned(@NotNull LabelEntityAssignment unassignments, @NotNull Instant timestamp)
-      implements UnassignEntitiesToLabelsResult {}
+      implements UnassignLabelsToEntitiesResult {}
 
   /**
    * Result when the entities unassignment was skipped.
@@ -42,7 +42,7 @@ public sealed interface UnassignEntitiesToLabelsResult {
    * @param unassignments empty unassignments (no effective changes)
    */
   record Skipped(@NotNull LabelEntityAssignment unassignments)
-      implements UnassignEntitiesToLabelsResult {
+      implements UnassignLabelsToEntitiesResult {
     /** Creates a Skipped result with empty assignments. */
     public Skipped() {
       this(LabelEntityAssignment.builder().build());
@@ -56,7 +56,7 @@ public sealed interface UnassignEntitiesToLabelsResult {
    * @param timestamp the unassignment timestamp
    * @return unassigned result
    */
-  static UnassignEntitiesToLabelsResult unassigned(
+  static UnassignLabelsToEntitiesResult unassigned(
       @NotNull LabelEntityAssignment assignments, @NotNull Instant timestamp) {
     return new Unassigned(assignments, timestamp);
   }
@@ -66,7 +66,7 @@ public sealed interface UnassignEntitiesToLabelsResult {
    *
    * @return skipped result with empty unassignments
    */
-  static UnassignEntitiesToLabelsResult skipped() {
+  static UnassignLabelsToEntitiesResult skipped() {
     return new Skipped();
   }
 
