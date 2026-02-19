@@ -86,12 +86,15 @@ graph TD
   - `exception/` - Domain-specific exceptions
 
 - **`usecase/`** - Application use cases (orchestrate domain logic)
-  - **Label Management**: `CreateLabelUseCase`, `UpdateLabelUseCase`, `RemoveLabelUseCase`, `RestoreLabelUseCase`
-  - **Label Assignment**: `AssignEntitiesToLabelsUseCase`, `UnassignEntitiesFromLabelsUseCase`, `ReassignLabelsToEntitiesUseCase`
+  - **Label Management**: `CreateLabelUseCase`, `UpdateLabelUseCase`, `RemoveLabelUseCase`, `RestoreLabelUseCase`, `UpsertLabelUseCase` (create-or-update, delegates internally)
+  - **Label Assignment**: `AssignLabelsToEntitiesUseCase`, `UnassignLabelsToEntitiesUseCase`, `ReassignLabelsToEntitiesUseCase`
   - **Label Queries**: `GetAllLabelsUseCase`, `GetLabelsByIdsUseCase`, `SearchLabelsUseCase`
   - **Assignment Queries**: `GetLabelsAssignByEntitesUseCase`, `GetScopesAssignByLabelsUseCase`
   - All use cases have Request/Result objects (or return primitives/collections)
   - `audit/` - Audit logging support with snapshots and revert handlers
+
+- **`api/`** - Public query API
+  - `LabelsQuery` - Simple query interface: `getEntityIdsByLabels(String entityType, List<String> labelIds)`
 
 - **`port/`** - Interface definitions for infrastructure (boundaries)
   - `LabelRepository` - Persistence operations (extends `AnchorResolver`)
@@ -211,8 +214,8 @@ All use cases follow this pattern:
 **Result Pattern**: Most mutation operations return sealed result types with variants:
 - **Assigned/Unassigned** vs **Skipped** - Indicates whether changes were made or operation was no-op
 - Results include `LabelSnapshot`, `timestamp`, and effective changes for audit logging
-- Example: `AssignEntitiesToLabelsResult.assigned(...)` or `AssignEntitiesToLabelsResult.skipped()`
-- `UpdateLabelResult` uses sealed interface with `Updated` and `Unchanged` implementations
+- Example: `AssignLabelsToEntitiesResult.assigned(...)` or `AssignLabelsToEntitiesResult.skipped()`
+- `LabelUpdateResult` uses sealed interface with `Updated` and `Unchanged` implementations
 
 **Label CRUD Use Cases** (Create/Update/Remove):
 ```java
@@ -237,8 +240,8 @@ public CreateLabelResult createLabel(CreateLabelRequest request) {
 
 **Label Assignment Use Cases** (Assign/Unassign entities):
 ```java
-public AssignEntitiesToLabelsResult assignEntitiesToLabels(
-    AssignEntitiesToLabelsRequest request) {
+public AssignLabelsToEntitiesResult assignEntitiesToLabels(
+    AssignLabelsToEntitiesRequest request) {
 
   // 1. Resolve label identifiers (supports both IDs and Anchors)
   List<String> labelIds =
@@ -253,7 +256,7 @@ public AssignEntitiesToLabelsResult assignEntitiesToLabels(
   this.labelEntityAssigner.assignEntitiesToLabels(labelIds, request.entityRefs());
 
   // 4. Return result with effective assignments
-  return AssignEntitiesToLabelsResult.assigned(effectiveAssignments, timestamp);
+  return AssignLabelsToEntitiesResult.assigned(effectiveAssignments, timestamp);
 }
 ```
 
@@ -392,6 +395,7 @@ All checks run during `mvn verify` and must pass before merging code.
 ### Common Mistakes to Avoid
 ❌ Using old interface names (`AccessControl`, `LabelAssigner`)
 ❌ Using old method names (`isLabelManager()`, `isAllowedToAssignLablels()`)
+❌ Using old assignment class names (`AssignEntitiesToLabelsUseCase`, `UnassignEntitiesFromLabelsUseCase`) — current names are `AssignLabelsToEntitiesUseCase`, `UnassignLabelsToEntitiesUseCase`
 ❌ Including `#` in color values (use "ffd700" not "#ffd700")
 ❌ Mixing permission checks (use correct check for each operation type)
 ❌ Forgetting to handle `Optional<Label>` from repository.get()
