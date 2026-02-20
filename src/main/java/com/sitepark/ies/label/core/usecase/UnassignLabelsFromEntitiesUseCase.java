@@ -24,7 +24,7 @@ import org.jetbrains.annotations.NotNull;
  * <p><b>Permission Required:</b> Entity Write Access ({@link
  * AuthorizationService#isLabelAssignable(List)})
  */
-public final class UnassignLabelsToEntitiesUseCase {
+public final class UnassignLabelsFromEntitiesUseCase {
 
   private static final Logger LOGGER = LogManager.getLogger();
   private final LabelRepository repository;
@@ -33,7 +33,7 @@ public final class UnassignLabelsToEntitiesUseCase {
   private final Clock clock;
 
   @Inject
-  UnassignLabelsToEntitiesUseCase(
+  UnassignLabelsFromEntitiesUseCase(
       LabelRepository repository,
       LabelEntityAssigner labelAssigner,
       AuthorizationService accessControl,
@@ -53,11 +53,11 @@ public final class UnassignLabelsToEntitiesUseCase {
    * @throws AccessDeniedException if the user is not allowed to unassign labels from entities
    */
   @NotNull
-  public UnassignLabelsToEntitiesResult unassignEntitiesFromLabels(
-      @NotNull UnassignLabelsToEntitiesRequest request) {
+  public UnassignLabelsFromEntitiesResult unassignEntitiesFromLabels(
+      @NotNull UnassignLabelsFromEntitiesRequest request) {
 
     if (request.isEmpty()) {
-      return UnassignLabelsToEntitiesResult.skipped();
+      return UnassignLabelsFromEntitiesResult.skipped();
     }
 
     List<String> labelIds =
@@ -79,14 +79,14 @@ public final class UnassignLabelsToEntitiesUseCase {
       if (LOGGER.isInfoEnabled()) {
         LOGGER.info("no effective unassignments found, skipping");
       }
-      return UnassignLabelsToEntitiesResult.skipped();
+      return UnassignLabelsFromEntitiesResult.skipped();
     }
 
     this.labelEntityAssigner.unassignEntitiesFromLabels(labelIds, request.entityRefs());
 
     Instant timestamp = Instant.now(this.clock);
 
-    return UnassignLabelsToEntitiesResult.unassigned(effectiveUnassignment, timestamp);
+    return UnassignLabelsFromEntitiesResult.unassigned(effectiveUnassignment, timestamp);
   }
 
   private LabelEntityAssignment effectiveUnassignments(

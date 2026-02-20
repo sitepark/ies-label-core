@@ -22,7 +22,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class UnassignLabelsToEntitiesUseCaseTest {
+class UnassignLabelsFromEntitiesUseCaseTest {
 
   private static final EntityRef ENTITY_REF = EntityRef.of("user", "user-1");
   private static final String LABEL_ID = "1";
@@ -30,7 +30,7 @@ class UnassignLabelsToEntitiesUseCaseTest {
   private LabelRepository repository;
   private LabelEntityAssigner labelEntityAssigner;
   private AuthorizationService accessControl;
-  private UnassignLabelsToEntitiesUseCase useCase;
+  private UnassignLabelsFromEntitiesUseCase useCase;
 
   @BeforeEach
   void setUp() {
@@ -39,26 +39,26 @@ class UnassignLabelsToEntitiesUseCaseTest {
     this.accessControl = mock();
     Clock clock = Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneId.of("UTC"));
     this.useCase =
-        new UnassignLabelsToEntitiesUseCase(
+        new UnassignLabelsFromEntitiesUseCase(
             this.repository, this.labelEntityAssigner, this.accessControl, clock);
   }
 
   @Test
   void testUnassignSkipsWhenRequestHasNoEntities() {
-    UnassignLabelsToEntitiesRequest request =
-        UnassignLabelsToEntitiesRequest.builder().labelIdentifiers(b -> b.id(LABEL_ID)).build();
+    UnassignLabelsFromEntitiesRequest request =
+        UnassignLabelsFromEntitiesRequest.builder().labelIdentifiers(b -> b.id(LABEL_ID)).build();
 
-    UnassignLabelsToEntitiesResult result = this.useCase.unassignEntitiesFromLabels(request);
+    UnassignLabelsFromEntitiesResult result = this.useCase.unassignEntitiesFromLabels(request);
 
     assertFalse(result.wasUnassigned(), "Should skip when the entity list is empty");
   }
 
   @Test
   void testUnassignSkipsWhenRequestHasNoLabels() {
-    UnassignLabelsToEntitiesRequest request =
-        UnassignLabelsToEntitiesRequest.builder().entityRefs(b -> b.add(ENTITY_REF)).build();
+    UnassignLabelsFromEntitiesRequest request =
+        UnassignLabelsFromEntitiesRequest.builder().entityRefs(b -> b.add(ENTITY_REF)).build();
 
-    UnassignLabelsToEntitiesResult result = this.useCase.unassignEntitiesFromLabels(request);
+    UnassignLabelsFromEntitiesResult result = this.useCase.unassignEntitiesFromLabels(request);
 
     assertFalse(result.wasUnassigned(), "Should skip when the label list is empty");
   }
@@ -68,8 +68,8 @@ class UnassignLabelsToEntitiesUseCaseTest {
     when(this.accessControl.isLabelAssignable(any())).thenReturn(false);
     when(this.labelEntityAssigner.getEntitiesAssignByLabels(any()))
         .thenReturn(LabelEntityAssignment.builder().assignment(LABEL_ID, ENTITY_REF).build());
-    UnassignLabelsToEntitiesRequest request =
-        UnassignLabelsToEntitiesRequest.builder()
+    UnassignLabelsFromEntitiesRequest request =
+        UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
             .labelIdentifiers(b -> b.id(LABEL_ID))
             .build();
@@ -84,13 +84,13 @@ class UnassignLabelsToEntitiesUseCaseTest {
     when(this.accessControl.isLabelAssignable(any())).thenReturn(true);
     when(this.labelEntityAssigner.getEntitiesAssignByLabels(any()))
         .thenReturn(LabelEntityAssignment.builder().build());
-    UnassignLabelsToEntitiesRequest request =
-        UnassignLabelsToEntitiesRequest.builder()
+    UnassignLabelsFromEntitiesRequest request =
+        UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
             .labelIdentifiers(b -> b.id(LABEL_ID))
             .build();
 
-    UnassignLabelsToEntitiesResult result = this.useCase.unassignEntitiesFromLabels(request);
+    UnassignLabelsFromEntitiesResult result = this.useCase.unassignEntitiesFromLabels(request);
 
     assertFalse(
         result.wasUnassigned(),
@@ -103,8 +103,8 @@ class UnassignLabelsToEntitiesUseCaseTest {
         LabelEntityAssignment.builder().assignment(LABEL_ID, ENTITY_REF).build();
     when(this.accessControl.isLabelAssignable(any())).thenReturn(true);
     when(this.labelEntityAssigner.getEntitiesAssignByLabels(any())).thenReturn(existingAssignment);
-    UnassignLabelsToEntitiesRequest request =
-        UnassignLabelsToEntitiesRequest.builder()
+    UnassignLabelsFromEntitiesRequest request =
+        UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
             .labelIdentifiers(b -> b.id(LABEL_ID))
             .build();
@@ -120,8 +120,8 @@ class UnassignLabelsToEntitiesUseCaseTest {
     when(this.accessControl.isLabelAssignable(any())).thenReturn(true);
     when(this.labelEntityAssigner.getEntitiesAssignByLabels(any()))
         .thenReturn(LabelEntityAssignment.builder().build());
-    UnassignLabelsToEntitiesRequest request =
-        UnassignLabelsToEntitiesRequest.builder()
+    UnassignLabelsFromEntitiesRequest request =
+        UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
             .labelIdentifiers(b -> b.id(LABEL_ID))
             .build();
@@ -137,13 +137,13 @@ class UnassignLabelsToEntitiesUseCaseTest {
         LabelEntityAssignment.builder().assignment(LABEL_ID, ENTITY_REF).build();
     when(this.accessControl.isLabelAssignable(any())).thenReturn(true);
     when(this.labelEntityAssigner.getEntitiesAssignByLabels(any())).thenReturn(existingAssignment);
-    UnassignLabelsToEntitiesRequest request =
-        UnassignLabelsToEntitiesRequest.builder()
+    UnassignLabelsFromEntitiesRequest request =
+        UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
             .labelIdentifiers(b -> b.id(LABEL_ID))
             .build();
 
-    UnassignLabelsToEntitiesResult result = this.useCase.unassignEntitiesFromLabels(request);
+    UnassignLabelsFromEntitiesResult result = this.useCase.unassignEntitiesFromLabels(request);
 
     assertTrue(
         result.wasUnassigned(), "Should return an Unassigned result when unassignments were made");

@@ -14,9 +14,9 @@ import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@JsonDeserialize(builder = UnassignLabelsToEntitiesRequest.Builder.class)
+@JsonDeserialize(builder = UnassignLabelsFromEntitiesRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
-public final class UnassignLabelsToEntitiesRequest {
+public final class UnassignLabelsFromEntitiesRequest {
 
   @NotNull private final List<EntityRef> entityRefs;
 
@@ -24,7 +24,7 @@ public final class UnassignLabelsToEntitiesRequest {
 
   @Nullable private final String auditParentId;
 
-  private UnassignLabelsToEntitiesRequest(Builder builder) {
+  private UnassignLabelsFromEntitiesRequest(Builder builder) {
     this.entityRefs = List.copyOf(builder.entityRefs);
     this.labelIdentifiers = List.copyOf(builder.labelIdentifiers);
     this.auditParentId = builder.auditParentId;
@@ -61,7 +61,7 @@ public final class UnassignLabelsToEntitiesRequest {
 
   @Override
   public boolean equals(Object o) {
-    return (o instanceof UnassignLabelsToEntitiesRequest that)
+    return (o instanceof UnassignLabelsFromEntitiesRequest that)
         && Objects.equals(this.entityRefs, that.entityRefs)
         && Objects.equals(this.labelIdentifiers, that.labelIdentifiers)
         && Objects.equals(this.auditParentId, that.auditParentId);
@@ -69,7 +69,7 @@ public final class UnassignLabelsToEntitiesRequest {
 
   @Override
   public String toString() {
-    return "UnassignLabelsToEntitiesRequest{"
+    return "UnassignLabelsFromEntitiesRequest{"
         + ", entityRefs="
         + entityRefs
         + "labelIdentifiers="
@@ -89,7 +89,7 @@ public final class UnassignLabelsToEntitiesRequest {
 
     private Builder() {}
 
-    private Builder(UnassignLabelsToEntitiesRequest request) {
+    private Builder(UnassignLabelsFromEntitiesRequest request) {
       this.entityRefs.addAll(request.entityRefs);
       this.labelIdentifiers.addAll(request.labelIdentifiers);
       this.auditParentId = request.auditParentId;
@@ -116,8 +116,8 @@ public final class UnassignLabelsToEntitiesRequest {
       return this;
     }
 
-    public UnassignLabelsToEntitiesRequest build() {
-      return new UnassignLabelsToEntitiesRequest(this);
+    public UnassignLabelsFromEntitiesRequest build() {
+      return new UnassignLabelsFromEntitiesRequest(this);
     }
   }
 }

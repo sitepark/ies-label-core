@@ -6,11 +6,11 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.jupiter.api.Test;
 
-class UnassignLabelsToEntitiesRequestTest {
+class UnassignLabelsFromEntitiesRequestTest {
 
   @Test
   void testEquals() {
-    EqualsVerifier.forClass(UnassignLabelsToEntitiesRequest.class)
+    EqualsVerifier.forClass(UnassignLabelsFromEntitiesRequest.class)
         .withPrefabValues(EntityRef.class, EntityRef.of("user", "1"), EntityRef.of("role", "2"))
         .withPrefabValues(Identifier.class, Identifier.ofId("1"), Identifier.ofId("2"))
         .suppress(Warning.STRICT_INHERITANCE)
