@@ -3,8 +3,10 @@ package com.sitepark.ies.label.core.usecase;
 import com.sitepark.ies.label.core.domain.entity.Label;
 import com.sitepark.ies.label.core.domain.exception.LabelNotFoundException;
 import com.sitepark.ies.label.core.domain.service.IdentifierResolver;
+import com.sitepark.ies.label.core.domain.value.LabelEntityAssignment;
 import com.sitepark.ies.label.core.domain.value.LabelSnapshot;
 import com.sitepark.ies.label.core.port.AuthorizationService;
+import com.sitepark.ies.label.core.port.LabelEntityAssigner;
 import com.sitepark.ies.label.core.port.LabelRepository;
 import com.sitepark.ies.label.core.port.LabelScopeAssigner;
 import com.sitepark.ies.sharedkernel.base.Identifier;
@@ -29,6 +31,8 @@ public final class RemoveLabelUseCase {
 
   private final LabelScopeAssigner scopeAssigner;
 
+  private final LabelEntityAssigner entityAssigner;
+
   private final AuthorizationService accessControl;
 
   private final Clock clock;
@@ -37,10 +41,12 @@ public final class RemoveLabelUseCase {
   RemoveLabelUseCase(
       LabelRepository repository,
       LabelScopeAssigner scopeAssigner,
+      LabelEntityAssigner entityAssigner,
       AuthorizationService accessControl,
       Clock clock) {
     this.repository = repository;
     this.scopeAssigner = scopeAssigner;
+    this.entityAssigner = entityAssigner;
     this.accessControl = accessControl;
     this.clock = clock;
   }
@@ -65,8 +71,10 @@ public final class RemoveLabelUseCase {
     // Create snapshot BEFORE removal (for audit)
     Label label = this.loadLabel(id);
     List<String> scopeIds = this.scopeAssigner.getScopesAssignByLabel(id);
+    LabelEntityAssignment entityAssignment =
+        this.entityAssigner.getEntitiesAssignByLabels(List.of(id));
 
-    LabelSnapshot snapshot = new LabelSnapshot(label, scopeIds);
+    LabelSnapshot snapshot = new LabelSnapshot(label, scopeIds, entityAssignment.entityRefs());
     Instant timestamp = Instant.now(this.clock);
 
     // Perform removal

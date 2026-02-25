@@ -73,7 +73,7 @@ public final class CreateLabelUseCase {
     }
 
     Label createdLabel = this.repository.get(labelId).orElseThrow();
-    LabelSnapshot snapshot = new LabelSnapshot(createdLabel, scopeIds);
+    LabelSnapshot snapshot = new LabelSnapshot(createdLabel, scopeIds, List.of());
 
     return new CreateLabelResult(labelId, snapshot, scopeReassignmentResult, timestamp);
   }

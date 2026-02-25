@@ -9,10 +9,13 @@ import static org.mockito.Mockito.when;
 
 import com.sitepark.ies.label.core.domain.entity.Label;
 import com.sitepark.ies.label.core.domain.exception.LabelNotFoundException;
+import com.sitepark.ies.label.core.domain.value.LabelEntityAssignment;
 import com.sitepark.ies.label.core.port.AuthorizationService;
+import com.sitepark.ies.label.core.port.LabelEntityAssigner;
 import com.sitepark.ies.label.core.port.LabelRepository;
 import com.sitepark.ies.label.core.port.LabelScopeAssigner;
 import com.sitepark.ies.sharedkernel.base.Identifier;
+import com.sitepark.ies.sharedkernel.domain.EntityRef;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import java.time.Clock;
 import java.time.Instant;
@@ -30,6 +33,7 @@ class RemoveLabelUseCaseTest {
 
   private LabelRepository repository;
   private LabelScopeAssigner scopeAssigner;
+  private LabelEntityAssigner entityAssigner;
   private AuthorizationService accessControl;
   private RemoveLabelUseCase useCase;
 
@@ -37,10 +41,12 @@ class RemoveLabelUseCaseTest {
   void setUp() {
     this.repository = mock();
     this.scopeAssigner = mock();
+    this.entityAssigner = mock();
     this.accessControl = mock();
     Clock clock = Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneId.of("UTC"));
     this.useCase =
-        new RemoveLabelUseCase(this.repository, this.scopeAssigner, this.accessControl, clock);
+        new RemoveLabelUseCase(
+            this.repository, this.scopeAssigner, this.entityAssigner, this.accessControl, clock);
   }
 
   @Test
@@ -58,6 +64,8 @@ class RemoveLabelUseCaseTest {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get(LABEL_ID)).thenReturn(Optional.empty());
     when(this.scopeAssigner.getScopesAssignByLabel(any())).thenReturn(List.of());
+    when(this.entityAssigner.getEntitiesAssignByLabels(any()))
+        .thenReturn(LabelEntityAssignment.builder().build());
     RemoveLabelRequest request = RemoveLabelRequest.builder().id(LABEL_ID).build();
     assertThrows(
         LabelNotFoundException.class,
@@ -70,6 +78,8 @@ class RemoveLabelUseCaseTest {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get(LABEL_ID)).thenReturn(Optional.of(TEST_LABEL));
     when(this.scopeAssigner.getScopesAssignByLabel(LABEL_ID)).thenReturn(List.of());
+    when(this.entityAssigner.getEntitiesAssignByLabels(any()))
+        .thenReturn(LabelEntityAssignment.builder().build());
     RemoveLabelRequest request = RemoveLabelRequest.builder().id(LABEL_ID).build();
 
     this.useCase.removeLabel(request);
@@ -82,6 +92,8 @@ class RemoveLabelUseCaseTest {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get(LABEL_ID)).thenReturn(Optional.of(TEST_LABEL));
     when(this.scopeAssigner.getScopesAssignByLabel(LABEL_ID)).thenReturn(List.of("user"));
+    when(this.entityAssigner.getEntitiesAssignByLabels(any()))
+        .thenReturn(LabelEntityAssignment.builder().build());
     RemoveLabelRequest request = RemoveLabelRequest.builder().id(LABEL_ID).build();
 
     this.useCase.removeLabel(request);
@@ -90,10 +102,29 @@ class RemoveLabelUseCaseTest {
   }
 
   @Test
+  void testRemoveLabelFetchesEntitiesForSnapshot() {
+    when(this.accessControl.isLabelManagable()).thenReturn(true);
+    when(this.repository.get(LABEL_ID)).thenReturn(Optional.of(TEST_LABEL));
+    when(this.scopeAssigner.getScopesAssignByLabel(LABEL_ID)).thenReturn(List.of("user"));
+    when(this.entityAssigner.getEntitiesAssignByLabels(List.of(LABEL_ID)))
+        .thenReturn(
+            LabelEntityAssignment.builder()
+                .assignment(LABEL_ID, EntityRef.of("user", "2"))
+                .build());
+    RemoveLabelRequest request = RemoveLabelRequest.builder().id(LABEL_ID).build();
+
+    this.useCase.removeLabel(request);
+
+    verify(this.entityAssigner).getEntitiesAssignByLabels(List.of(LABEL_ID));
+  }
+
+  @Test
   void testRemoveLabelReturnsRemovedResult() {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get(LABEL_ID)).thenReturn(Optional.of(TEST_LABEL));
     when(this.scopeAssigner.getScopesAssignByLabel(LABEL_ID)).thenReturn(List.of());
+    when(this.entityAssigner.getEntitiesAssignByLabels(any()))
+        .thenReturn(LabelEntityAssignment.builder().build());
     RemoveLabelRequest request = RemoveLabelRequest.builder().id(LABEL_ID).build();
 
     RemoveLabelResult result = this.useCase.removeLabel(request);
@@ -107,6 +138,8 @@ class RemoveLabelUseCaseTest {
     when(this.repository.resolveAnchor(any())).thenReturn(Optional.of(LABEL_ID));
     when(this.repository.get(LABEL_ID)).thenReturn(Optional.of(TEST_LABEL));
     when(this.scopeAssigner.getScopesAssignByLabel(LABEL_ID)).thenReturn(List.of());
+    when(this.entityAssigner.getEntitiesAssignByLabels(any()))
+        .thenReturn(LabelEntityAssignment.builder().build());
     RemoveLabelRequest request =
         RemoveLabelRequest.builder().identifier(Identifier.ofAnchor("test-label")).build();
 

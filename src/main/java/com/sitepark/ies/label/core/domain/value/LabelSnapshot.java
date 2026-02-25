@@ -1,6 +1,7 @@
 package com.sitepark.ies.label.core.domain.value;
 
 import com.sitepark.ies.label.core.domain.entity.Label;
+import com.sitepark.ies.sharedkernel.domain.EntityRef;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.concurrent.Immutable;
@@ -13,29 +14,25 @@ import org.jetbrains.annotations.NotNull;
  * point in time, including all associated scope IDs.
  *
  * @param label the label entity
- * @param scopes the list of scope IDs associated with this label
+ * @param scopes the list of scopes associated with this label
+ * @param entityRefs the list of entity references associated with this label
  */
 @Immutable
-public record LabelSnapshot(@NotNull Label label, @NotNull List<String> scopes) {
+public record LabelSnapshot(
+    @NotNull Label label, @NotNull List<String> scopes, @NotNull List<EntityRef> entityRefs) {
 
-  /**
-   * Canonical constructor that ensures immutability by creating defensive copies of the scope IDs
-   * list.
-   *
-   * @param label the label entity, must not be null
-   * @param scopes the list of scope IDs, must not be null (empty list if no scopes)
-   */
   public LabelSnapshot {
     scopes = scopes != null ? List.copyOf(scopes) : Collections.emptyList();
+    entityRefs = entityRefs != null ? List.copyOf(entityRefs) : Collections.emptyList();
   }
 
-  /**
-   * Returns an immutable copy of the scope IDs list.
-   *
-   * @return an immutable list of scope IDs
-   */
   @Override
   public List<String> scopes() {
     return List.copyOf(scopes);
+  }
+
+  @Override
+  public List<EntityRef> entityRefs() {
+    return List.copyOf(entityRefs);
   }
 }

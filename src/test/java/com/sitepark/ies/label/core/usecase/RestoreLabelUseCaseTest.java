@@ -11,8 +11,10 @@ import static org.mockito.Mockito.when;
 import com.sitepark.ies.label.core.domain.entity.Label;
 import com.sitepark.ies.label.core.domain.value.LabelSnapshot;
 import com.sitepark.ies.label.core.port.AuthorizationService;
+import com.sitepark.ies.label.core.port.LabelEntityAssigner;
 import com.sitepark.ies.label.core.port.LabelRepository;
 import com.sitepark.ies.label.core.port.LabelScopeAssigner;
+import com.sitepark.ies.sharedkernel.domain.EntityRef;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import java.time.Clock;
 import java.time.Instant;
@@ -29,6 +31,7 @@ class RestoreLabelUseCaseTest {
 
   private LabelRepository repository;
   private LabelScopeAssigner scopeAssigner;
+  private LabelEntityAssigner entityAssigner;
   private AuthorizationService accessControl;
   private RestoreLabelUseCase useCase;
 
@@ -36,17 +39,19 @@ class RestoreLabelUseCaseTest {
   void setUp() {
     this.repository = mock();
     this.scopeAssigner = mock();
+    this.entityAssigner = mock();
     this.accessControl = mock();
     Clock clock = Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneId.of("UTC"));
     this.useCase =
-        new RestoreLabelUseCase(this.repository, this.scopeAssigner, this.accessControl, clock);
+        new RestoreLabelUseCase(
+            this.repository, this.scopeAssigner, this.entityAssigner, this.accessControl, clock);
   }
 
   @Test
   void testRestoreLabelThrowsWhenLabelIdIsNull() {
     Label labelWithoutId = Label.builder().name("Test").build();
     RestoreLabelRequest request =
-        new RestoreLabelRequest(new LabelSnapshot(labelWithoutId, List.of()), null);
+        new RestoreLabelRequest(new LabelSnapshot(labelWithoutId, List.of(), List.of()), null);
     assertThrows(
         IllegalArgumentException.class,
         () -> this.useCase.restoreLabel(request),
@@ -57,7 +62,7 @@ class RestoreLabelUseCaseTest {
   void testRestoreLabelThrowsWhenLabelNameIsBlank() {
     Label labelWithoutName = Label.builder().id("1").build();
     RestoreLabelRequest request =
-        new RestoreLabelRequest(new LabelSnapshot(labelWithoutName, List.of()), null);
+        new RestoreLabelRequest(new LabelSnapshot(labelWithoutName, List.of(), List.of()), null);
     assertThrows(
         IllegalArgumentException.class,
         () -> this.useCase.restoreLabel(request),
@@ -68,7 +73,7 @@ class RestoreLabelUseCaseTest {
   void testRestoreLabelThrowsWhenNotLabelManager() {
     when(this.accessControl.isLabelManagable()).thenReturn(false);
     RestoreLabelRequest request =
-        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of()), null);
+        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of(), List.of()), null);
     assertThrows(
         AccessDeniedException.class,
         () -> this.useCase.restoreLabel(request),
@@ -80,7 +85,7 @@ class RestoreLabelUseCaseTest {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get("1")).thenReturn(Optional.of(VALID_LABEL));
     RestoreLabelRequest request =
-        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of()), null);
+        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of(), List.of()), null);
 
     RestoreLabelResult result = this.useCase.restoreLabel(request);
 
@@ -94,7 +99,7 @@ class RestoreLabelUseCaseTest {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get("1")).thenReturn(Optional.empty());
     RestoreLabelRequest request =
-        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of()), null);
+        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of(), List.of()), null);
 
     this.useCase.restoreLabel(request);
 
@@ -106,7 +111,7 @@ class RestoreLabelUseCaseTest {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get("1")).thenReturn(Optional.empty());
     RestoreLabelRequest request =
-        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of("user")), null);
+        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of("user"), List.of()), null);
 
     this.useCase.restoreLabel(request);
 
@@ -114,11 +119,25 @@ class RestoreLabelUseCaseTest {
   }
 
   @Test
+  void testRestoreLabelAssignsEntityRefsWhenProvided() {
+    when(this.accessControl.isLabelManagable()).thenReturn(true);
+    when(this.repository.get("1")).thenReturn(Optional.empty());
+    RestoreLabelRequest request =
+        new RestoreLabelRequest(
+            new LabelSnapshot(VALID_LABEL, List.of(), List.of(EntityRef.of("user", "2"))), null);
+
+    this.useCase.restoreLabel(request);
+
+    verify(this.entityAssigner)
+        .assignEntitiesToLabels(List.of("1"), List.of(EntityRef.of("user", "2")));
+  }
+
+  @Test
   void testRestoreLabelDoesNotAssignScopesWhenNoneProvided() {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get("1")).thenReturn(Optional.empty());
     RestoreLabelRequest request =
-        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of()), null);
+        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of(), List.of()), null);
 
     this.useCase.restoreLabel(request);
 
@@ -130,7 +149,7 @@ class RestoreLabelUseCaseTest {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get("1")).thenReturn(Optional.empty());
     RestoreLabelRequest request =
-        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of()), null);
+        new RestoreLabelRequest(new LabelSnapshot(VALID_LABEL, List.of(), List.of()), null);
 
     RestoreLabelResult result = this.useCase.restoreLabel(request);
 

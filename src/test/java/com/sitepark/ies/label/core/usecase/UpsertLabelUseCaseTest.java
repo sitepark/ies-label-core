@@ -40,7 +40,7 @@ class UpsertLabelUseCaseTest {
 
   @Test
   void testUpsertCreatesWhenLabelHasNoId() {
-    LabelSnapshot snapshot = new LabelSnapshot(LABEL_WITHOUT_ID, List.of());
+    LabelSnapshot snapshot = new LabelSnapshot(LABEL_WITHOUT_ID, List.of(), List.of());
     AssignScopesToLabelsResult scopeResult = AssignScopesToLabelsResult.skipped();
     CreateLabelResult createResult = new CreateLabelResult("2", snapshot, scopeResult, TIMESTAMP);
     when(this.createLabelUseCase.createLabel(any())).thenReturn(createResult);
@@ -55,7 +55,7 @@ class UpsertLabelUseCaseTest {
 
   @Test
   void testUpsertCallsCreateWhenLabelHasNoId() {
-    LabelSnapshot snapshot = new LabelSnapshot(LABEL_WITHOUT_ID, List.of());
+    LabelSnapshot snapshot = new LabelSnapshot(LABEL_WITHOUT_ID, List.of(), List.of());
     AssignScopesToLabelsResult scopeResult = AssignScopesToLabelsResult.skipped();
     CreateLabelResult createResult = new CreateLabelResult("2", snapshot, scopeResult, TIMESTAMP);
     when(this.createLabelUseCase.createLabel(any())).thenReturn(createResult);

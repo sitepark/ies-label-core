@@ -3,9 +3,11 @@ package com.sitepark.ies.label.core.usecase;
 import com.sitepark.ies.label.core.domain.entity.Label;
 import com.sitepark.ies.label.core.domain.value.LabelSnapshot;
 import com.sitepark.ies.label.core.port.AuthorizationService;
+import com.sitepark.ies.label.core.port.LabelEntityAssigner;
 import com.sitepark.ies.label.core.port.LabelRepository;
 import com.sitepark.ies.label.core.port.LabelScopeAssigner;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
+import com.sitepark.ies.sharedkernel.domain.EntityRef;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import jakarta.inject.Inject;
 import java.time.Clock;
@@ -28,6 +30,7 @@ public final class RestoreLabelUseCase {
   private static final Logger LOGGER = LogManager.getLogger();
   private final LabelRepository repository;
   private final LabelScopeAssigner scopeAssigner;
+  private final LabelEntityAssigner entityAssigner;
   private final AuthorizationService accessControl;
   private final Clock clock;
 
@@ -35,10 +38,12 @@ public final class RestoreLabelUseCase {
   RestoreLabelUseCase(
       LabelRepository repository,
       LabelScopeAssigner scopeAssigner,
+      LabelEntityAssigner entityAssigner,
       AuthorizationService accessControl,
       Clock clock) {
     this.repository = repository;
     this.scopeAssigner = scopeAssigner;
+    this.entityAssigner = entityAssigner;
     this.accessControl = accessControl;
     this.clock = clock;
   }
@@ -56,6 +61,7 @@ public final class RestoreLabelUseCase {
 
     Label label = request.snapshot().label();
     List<String> scopeIds = request.snapshot().scopes();
+    List<EntityRef> entityRefs = request.snapshot().entityRefs();
 
     this.validateLabel(label);
 
@@ -77,13 +83,17 @@ public final class RestoreLabelUseCase {
 
     Instant timestamp = Instant.now(this.clock);
 
-    LabelSnapshot snapshot = new LabelSnapshot(label, scopeIds);
+    LabelSnapshot snapshot = new LabelSnapshot(label, scopeIds, entityRefs);
+
+    String labelId = label.id();
+    assert labelId != null : "label.id() was validated in validateLabel()";
 
     this.repository.restore(label);
     if (!scopeIds.isEmpty()) {
-      String labelId = label.id();
-      assert labelId != null : "label.id() was validated in validateLabel()";
       this.scopeAssigner.assignScopesToLabels(List.of(labelId), scopeIds);
+    }
+    if (!entityRefs.isEmpty()) {
+      this.entityAssigner.assignEntitiesToLabels(List.of(label.id()), entityRefs);
     }
 
     return RestoreLabelResult.restored(label.id(), snapshot, timestamp);

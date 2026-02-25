@@ -1,7 +1,7 @@
 package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.service.IdentifierResolver;
-import com.sitepark.ies.label.core.domain.value.LabelEntityAssignment;
+import com.sitepark.ies.label.core.domain.value.EntityLabelAssignment;
 import com.sitepark.ies.label.core.port.AuthorizationService;
 import com.sitepark.ies.label.core.port.LabelEntityAssigner;
 import com.sitepark.ies.label.core.port.LabelRepository;
@@ -72,8 +72,8 @@ public final class UnassignLabelsFromEntitiesUseCase {
           "unassign entities from labels({}) -> entities({})", labelIds, request.entityRefs());
     }
 
-    LabelEntityAssignment effectiveUnassignment =
-        effectiveUnassignments(labelIds, request.entityRefs());
+    EntityLabelAssignment effectiveUnassignment =
+        effectiveUnassignments(request.entityRefs(), labelIds);
 
     if (effectiveUnassignment.isEmpty()) {
       if (LOGGER.isInfoEnabled()) {
@@ -89,19 +89,19 @@ public final class UnassignLabelsFromEntitiesUseCase {
     return UnassignLabelsFromEntitiesResult.unassigned(effectiveUnassignment, timestamp);
   }
 
-  private LabelEntityAssignment effectiveUnassignments(
-      List<String> labelIds, List<EntityRef> entityRefs) {
+  private EntityLabelAssignment effectiveUnassignments(
+      List<EntityRef> entityRefs, List<String> labelIds) {
 
-    LabelEntityAssignment assignments =
-        this.labelEntityAssigner.getEntitiesAssignByLabels(labelIds);
+    EntityLabelAssignment assignments =
+        this.labelEntityAssigner.getLabelsAssignByEntities(entityRefs);
 
-    LabelEntityAssignment.Builder builder = LabelEntityAssignment.builder();
+    EntityLabelAssignment.Builder builder = EntityLabelAssignment.builder();
 
-    for (String labelId : labelIds) {
-      List<EntityRef> effectiveEntityRefs =
-          entityRefs.stream().filter(assignments.entityRefs(labelId)::contains).toList();
-      if (!effectiveEntityRefs.isEmpty()) {
-        builder.assignments(labelId, effectiveEntityRefs);
+    for (EntityRef entityRef : entityRefs) {
+      List<String> effectiveLabelIds =
+          labelIds.stream().filter(assignments.labelIds(entityRef)::contains).toList();
+      if (!effectiveLabelIds.isEmpty()) {
+        builder.assignments(entityRef, effectiveLabelIds);
       }
     }
 

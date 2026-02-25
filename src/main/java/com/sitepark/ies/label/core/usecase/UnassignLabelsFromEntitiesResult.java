@@ -1,6 +1,6 @@
 package com.sitepark.ies.label.core.usecase;
 
-import com.sitepark.ies.label.core.domain.value.LabelEntityAssignment;
+import com.sitepark.ies.label.core.domain.value.EntityLabelAssignment;
 import java.time.Instant;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ public sealed interface UnassignLabelsFromEntitiesResult {
    * @return the entity-label unassignments
    */
   @NotNull
-  LabelEntityAssignment unassignments();
+  EntityLabelAssignment unassignments();
 
   /**
    * Result when entities were successfully unassigned.
@@ -33,7 +33,7 @@ public sealed interface UnassignLabelsFromEntitiesResult {
    * @param unassignments the effective entity-label unassignments that were made
    * @param timestamp the timestamp when the unassignment occurred
    */
-  record Unassigned(@NotNull LabelEntityAssignment unassignments, @NotNull Instant timestamp)
+  record Unassigned(@NotNull EntityLabelAssignment unassignments, @NotNull Instant timestamp)
       implements UnassignLabelsFromEntitiesResult {}
 
   /**
@@ -41,11 +41,11 @@ public sealed interface UnassignLabelsFromEntitiesResult {
    *
    * @param unassignments empty unassignments (no effective changes)
    */
-  record Skipped(@NotNull LabelEntityAssignment unassignments)
+  record Skipped(@NotNull EntityLabelAssignment unassignments)
       implements UnassignLabelsFromEntitiesResult {
     /** Creates a Skipped result with empty assignments. */
     public Skipped() {
-      this(LabelEntityAssignment.builder().build());
+      this(EntityLabelAssignment.builder().build());
     }
   }
 
@@ -57,7 +57,7 @@ public sealed interface UnassignLabelsFromEntitiesResult {
    * @return unassigned result
    */
   static UnassignLabelsFromEntitiesResult unassigned(
-      @NotNull LabelEntityAssignment assignments, @NotNull Instant timestamp) {
+      @NotNull EntityLabelAssignment assignments, @NotNull Instant timestamp) {
     return new Unassigned(assignments, timestamp);
   }
 

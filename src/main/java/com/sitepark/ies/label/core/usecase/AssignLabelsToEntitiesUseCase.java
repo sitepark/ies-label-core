@@ -1,7 +1,7 @@
 package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.service.IdentifierResolver;
-import com.sitepark.ies.label.core.domain.value.LabelEntityAssignment;
+import com.sitepark.ies.label.core.domain.value.EntityLabelAssignment;
 import com.sitepark.ies.label.core.port.AuthorizationService;
 import com.sitepark.ies.label.core.port.LabelEntityAssigner;
 import com.sitepark.ies.label.core.port.LabelRepository;
@@ -72,8 +72,8 @@ public final class AssignLabelsToEntitiesUseCase {
       LOGGER.info("assign entities to labels({}) -> entities({})", labelIds, request.entityRefs());
     }
 
-    LabelEntityAssignment effectiveAssignments =
-        effectiveAssignments(labelIds, request.entityRefs());
+    EntityLabelAssignment effectiveAssignments =
+        effectiveAssignments(request.entityRefs(), labelIds);
 
     if (effectiveAssignments.isEmpty()) {
       if (LOGGER.isInfoEnabled()) {
@@ -89,21 +89,21 @@ public final class AssignLabelsToEntitiesUseCase {
     return AssignLabelsToEntitiesResult.assigned(effectiveAssignments, timestamp);
   }
 
-  private LabelEntityAssignment effectiveAssignments(
-      List<String> labelIds, List<EntityRef> entityRefs) {
+  private EntityLabelAssignment effectiveAssignments(
+      List<EntityRef> entityRefs, List<String> labelIds) {
 
-    LabelEntityAssignment assignments =
-        this.labelEntityAssigner.getEntitiesAssignByLabels(labelIds);
+    EntityLabelAssignment assignments =
+        this.labelEntityAssigner.getLabelsAssignByEntities(entityRefs);
 
-    LabelEntityAssignment.Builder builder = LabelEntityAssignment.builder();
+    EntityLabelAssignment.Builder builder = EntityLabelAssignment.builder();
 
-    for (String labelId : labelIds) {
-      List<EntityRef> effectiveEntityRefs =
-          entityRefs.stream()
-              .filter(Predicate.not(assignments.entityRefs(labelId)::contains))
+    for (EntityRef entityRef : entityRefs) {
+      List<String> effectiveLabelIds =
+          labelIds.stream()
+              .filter(Predicate.not(assignments.labelIds(entityRef)::contains))
               .toList();
-      if (!effectiveEntityRefs.isEmpty()) {
-        builder.assignments(labelId, effectiveEntityRefs);
+      if (!effectiveLabelIds.isEmpty()) {
+        builder.assignments(entityRef, effectiveLabelIds);
       }
     }
 

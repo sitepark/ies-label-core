@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sitepark.ies.label.core.domain.value.EntityLabelAssignment;
 import com.sitepark.ies.label.core.domain.value.LabelEntityAssignment;
 import com.sitepark.ies.label.core.port.AuthorizationService;
 import com.sitepark.ies.label.core.port.LabelEntityAssigner;
@@ -82,8 +83,8 @@ class UnassignLabelsFromEntitiesUseCaseTest {
   @Test
   void testUnassignSkipsWhenNoneCurrentlyAssigned() {
     when(this.accessControl.isLabelAssignable(any())).thenReturn(true);
-    when(this.labelEntityAssigner.getEntitiesAssignByLabels(any()))
-        .thenReturn(LabelEntityAssignment.builder().build());
+    when(this.labelEntityAssigner.getLabelsAssignByEntities(any()))
+        .thenReturn(EntityLabelAssignment.builder().build());
     UnassignLabelsFromEntitiesRequest request =
         UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
@@ -99,10 +100,10 @@ class UnassignLabelsFromEntitiesUseCaseTest {
 
   @Test
   void testUnassignCallsLabelEntityAssigner() {
-    LabelEntityAssignment existingAssignment =
-        LabelEntityAssignment.builder().assignment(LABEL_ID, ENTITY_REF).build();
+    EntityLabelAssignment existingAssignment =
+        EntityLabelAssignment.builder().assignment(ENTITY_REF, LABEL_ID).build();
     when(this.accessControl.isLabelAssignable(any())).thenReturn(true);
-    when(this.labelEntityAssigner.getEntitiesAssignByLabels(any())).thenReturn(existingAssignment);
+    when(this.labelEntityAssigner.getLabelsAssignByEntities(any())).thenReturn(existingAssignment);
     UnassignLabelsFromEntitiesRequest request =
         UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
@@ -118,8 +119,8 @@ class UnassignLabelsFromEntitiesUseCaseTest {
   @Test
   void testUnassignDoesNotCallAssignerWhenNoneCurrentlyAssigned() {
     when(this.accessControl.isLabelAssignable(any())).thenReturn(true);
-    when(this.labelEntityAssigner.getEntitiesAssignByLabels(any()))
-        .thenReturn(LabelEntityAssignment.builder().build());
+    when(this.labelEntityAssigner.getLabelsAssignByEntities(any()))
+        .thenReturn(EntityLabelAssignment.builder().build());
     UnassignLabelsFromEntitiesRequest request =
         UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
@@ -133,10 +134,10 @@ class UnassignLabelsFromEntitiesUseCaseTest {
 
   @Test
   void testUnassignReturnsUnassignedResult() {
-    LabelEntityAssignment existingAssignment =
-        LabelEntityAssignment.builder().assignment(LABEL_ID, ENTITY_REF).build();
+    EntityLabelAssignment existingAssignment =
+        EntityLabelAssignment.builder().assignment(ENTITY_REF, LABEL_ID).build();
     when(this.accessControl.isLabelAssignable(any())).thenReturn(true);
-    when(this.labelEntityAssigner.getEntitiesAssignByLabels(any())).thenReturn(existingAssignment);
+    when(this.labelEntityAssigner.getLabelsAssignByEntities(any())).thenReturn(existingAssignment);
     UnassignLabelsFromEntitiesRequest request =
         UnassignLabelsFromEntitiesRequest.builder()
             .entityRefs(b -> b.add(ENTITY_REF))
