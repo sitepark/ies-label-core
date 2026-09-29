@@ -9,15 +9,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.NotNull;
 
 @JsonDeserialize(builder = CreateLabelRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.LawOfDemeter"})
 public final class CreateLabelRequest {
 
-  @NotNull private final Label label;
+  private final Label label;
 
-  @NotNull private final List<String> scopes;
+  private final List<String> scopes;
 
   private CreateLabelRequest(Builder builder) {
     this.label = builder.label;
@@ -28,12 +27,10 @@ public final class CreateLabelRequest {
     return new Builder();
   }
 
-  @NotNull
   public Label label() {
     return this.label;
   }
 
-  @NotNull
   public List<String> scopes() {
     return this.scopes;
   }
@@ -60,6 +57,7 @@ public final class CreateLabelRequest {
   }
 
   @JsonPOJOBuilder(withPrefix = "")
+  @SuppressWarnings("NullAway.Init") // label is set via fluent setter and validated in build()
   public static final class Builder {
 
     private Label label;

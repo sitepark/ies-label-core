@@ -28,20 +28,19 @@ class AssignLabelsToEntitiesUseCaseTest {
   private static final EntityRef ENTITY_REF = EntityRef.of("user", "user-1");
   private static final String LABEL_ID = "1";
 
-  private LabelRepository repository;
   private LabelEntityAssigner labelEntityAssigner;
   private AuthorizationService accessControl;
   private AssignLabelsToEntitiesUseCase useCase;
 
   @BeforeEach
   void setUp() {
-    this.repository = mock();
+    LabelRepository repository = mock();
     this.labelEntityAssigner = mock();
     this.accessControl = mock();
     Clock clock = Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneId.of("UTC"));
     this.useCase =
         new AssignLabelsToEntitiesUseCase(
-            this.repository, this.labelEntityAssigner, this.accessControl, clock);
+            repository, this.labelEntityAssigner, this.accessControl, clock);
   }
 
   @Test

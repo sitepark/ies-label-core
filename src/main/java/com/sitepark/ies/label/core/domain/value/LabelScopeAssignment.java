@@ -6,9 +6,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.annotation.concurrent.Immutable;
 
-@Immutable
 public class LabelScopeAssignment {
 
   @SuppressWarnings("PMD.UseConcurrentHashMap")

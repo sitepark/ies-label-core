@@ -25,7 +25,7 @@ public final class IdentifierResolver {
                 identifier.resolveId(
                     (anchor) ->
                         this.anchorResolver
-                            .resolveAnchor(identifier.getAnchor())
+                            .resolveAnchor(anchor)
                             .orElseThrow(() -> new AnchorNotFoundException(anchor))))
         .toList();
   }
@@ -34,7 +34,7 @@ public final class IdentifierResolver {
     return identifier.resolveId(
         (anchor) ->
             this.anchorResolver
-                .resolveAnchor(identifier.getAnchor())
+                .resolveAnchor(anchor)
                 .orElseThrow(() -> new AnchorNotFoundException(anchor)));
   }
 }

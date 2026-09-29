@@ -2,14 +2,13 @@ package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.Objects;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Request to remove a single label from the repository.
  *
  * @param identifier the identifier (ID or anchor) of the label to remove
  */
-public record RemoveLabelRequest(@NotNull Identifier identifier) {
+public record RemoveLabelRequest(Identifier identifier) {
 
   /**
    * Creates a new builder for RemoveLabelRequest.
@@ -21,6 +20,7 @@ public record RemoveLabelRequest(@NotNull Identifier identifier) {
   }
 
   /** Builder for RemoveLabelRequest. */
+  @SuppressWarnings("NullAway.Init") // identifier is set via fluent setter and validated in build()
   public static final class Builder {
 
     private Identifier identifier;

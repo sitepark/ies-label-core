@@ -2,7 +2,6 @@ package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.value.EntityLabelAssignment;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of an entity-to-label assignment operation.
@@ -24,7 +23,6 @@ public sealed interface AssignLabelsToEntitiesResult {
    *
    * @return the entity-label assignments
    */
-  @NotNull
   EntityLabelAssignment assignments();
 
   /**
@@ -33,7 +31,7 @@ public sealed interface AssignLabelsToEntitiesResult {
    * @param assignments the effective entity-label assignments that were made
    * @param timestamp the timestamp when the assignment occurred
    */
-  record Assigned(@NotNull EntityLabelAssignment assignments, @NotNull Instant timestamp)
+  record Assigned(EntityLabelAssignment assignments, Instant timestamp)
       implements AssignLabelsToEntitiesResult {}
 
   /**
@@ -41,8 +39,7 @@ public sealed interface AssignLabelsToEntitiesResult {
    *
    * @param assignments empty assignments (no effective changes)
    */
-  record Skipped(@NotNull EntityLabelAssignment assignments)
-      implements AssignLabelsToEntitiesResult {
+  record Skipped(EntityLabelAssignment assignments) implements AssignLabelsToEntitiesResult {
     /** Creates a Skipped result with empty assignments. */
     public Skipped() {
       this(EntityLabelAssignment.builder().build());
@@ -57,7 +54,7 @@ public sealed interface AssignLabelsToEntitiesResult {
    * @return assigned result
    */
   static AssignLabelsToEntitiesResult assigned(
-      @NotNull EntityLabelAssignment assignments, @NotNull Instant timestamp) {
+      EntityLabelAssignment assignments, Instant timestamp) {
     return new Assigned(assignments, timestamp);
   }
 

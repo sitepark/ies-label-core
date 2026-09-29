@@ -1,7 +1,6 @@
 package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a user data update (without role assignments).
@@ -25,8 +24,7 @@ public sealed interface LabelUpdateResult {
    * @param patch the forward patch (old state to new state)
    * @param revertPatch the revert patch (new state to old state)
    */
-  record Updated(
-      @NotNull String labelName, @NotNull PatchDocument patch, @NotNull PatchDocument revertPatch)
+  record Updated(String labelName, PatchDocument patch, PatchDocument revertPatch)
       implements LabelUpdateResult {}
 
   /**
@@ -47,7 +45,7 @@ public sealed interface LabelUpdateResult {
    * @return updated result
    */
   static LabelUpdateResult updated(
-      @NotNull String labelName, @NotNull PatchDocument patch, @NotNull PatchDocument revertPatch) {
+      String labelName, PatchDocument patch, PatchDocument revertPatch) {
     return new Updated(labelName, patch, revertPatch);
   }
 }

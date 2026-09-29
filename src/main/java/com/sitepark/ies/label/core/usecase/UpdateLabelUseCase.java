@@ -6,6 +6,7 @@ import com.sitepark.ies.label.core.domain.value.LabelScopeAssignment;
 import com.sitepark.ies.label.core.port.AuthorizationService;
 import com.sitepark.ies.label.core.port.LabelRepository;
 import com.sitepark.ies.label.core.port.LabelScopeAssigner;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.anchor.AnchorNotFoundException;
 import com.sitepark.ies.sharedkernel.patch.PatchDocument;
@@ -16,6 +17,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
@@ -64,7 +66,7 @@ public final class UpdateLabelUseCase {
 
     Label oldLabel =
         this.repository
-            .get(newLabel.id())
+            .get(Objects.requireNonNull(newLabel.id(), "label id must not be null"))
             .orElseThrow(
                 () -> new LabelNotFoundException("No label with ID " + newLabel.id() + " found."))
             .toBuilder()
@@ -87,28 +89,38 @@ public final class UpdateLabelUseCase {
       this.repository.update(joinedLabel);
 
       PatchDocument revertPatch = this.patchService.createPatch(joinedLabel, oldLabel);
-      labelUpdateResult = LabelUpdateResult.updated(joinedLabel.name(), patch, revertPatch);
+      labelUpdateResult =
+          LabelUpdateResult.updated(
+              Objects.requireNonNull(joinedLabel.name(), "label name must not be null"),
+              patch,
+              revertPatch);
     }
 
     ReassignScopesToLabelsResult reassignScopesToLabelsResult;
     if (!request.scopes().isEmpty()) {
       reassignScopesToLabelsResult =
-          this.reassignRolesToUsers(List.of(joinedLabel.id()), request.scopes());
+          this.reassignRolesToUsers(
+              List.of(Objects.requireNonNull(joinedLabel.id(), "label id must not be null")),
+              request.scopes());
     } else {
       reassignScopesToLabelsResult = ReassignScopesToLabelsResult.skipped();
     }
 
     return new UpdateLabelResult(
-        joinedLabel.id(), timestamp, labelUpdateResult, reassignScopesToLabelsResult);
+        Objects.requireNonNull(joinedLabel.id(), "label id must not be null"),
+        timestamp,
+        labelUpdateResult,
+        reassignScopesToLabelsResult);
   }
 
   private Label toLabelWithId(Label label) {
     if (label.id() == null) {
-      if (label.anchor() != null) {
+      Anchor labelAnchor = label.anchor();
+      if (labelAnchor != null) {
         String id =
             this.repository
-                .resolveAnchor(label.anchor())
-                .orElseThrow(() -> new AnchorNotFoundException(label.anchor()));
+                .resolveAnchor(labelAnchor)
+                .orElseThrow(() -> new AnchorNotFoundException(labelAnchor));
         return label.toBuilder().id(id).build();
       }
       throw new IllegalArgumentException("Neither id nor anchor is specified to update the label.");
@@ -117,12 +129,13 @@ public final class UpdateLabelUseCase {
   }
 
   private void validateAnchor(Label label) {
-    if (label.anchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(label.anchor());
+    Anchor anchor = label.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
             if (!owner.equals(label.id())) {
-              throw new AnchorAlreadyExistsException(label.anchor(), owner);
+              throw new AnchorAlreadyExistsException(anchor, owner);
             }
           });
     }

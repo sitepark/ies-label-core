@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Use case for assigning entities to labels.
@@ -53,9 +52,8 @@ public final class AssignLabelsToEntitiesUseCase {
    * @return the result containing effective assignments and timestamp, or skipped result
    * @throws AccessDeniedException if the user is not allowed to assign labels to entities
    */
-  @NotNull
   public AssignLabelsToEntitiesResult assignEntitiesToLabels(
-      @NotNull AssignLabelsToEntitiesRequest request) {
+      AssignLabelsToEntitiesRequest request) {
 
     if (request.isEmpty()) {
       return AssignLabelsToEntitiesResult.skipped();

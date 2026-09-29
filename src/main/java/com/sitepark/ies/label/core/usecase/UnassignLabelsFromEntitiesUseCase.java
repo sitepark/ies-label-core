@@ -13,7 +13,6 @@ import java.time.Instant;
 import java.util.List;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Use case for unassigning entities from labels.
@@ -52,9 +51,8 @@ public final class UnassignLabelsFromEntitiesUseCase {
    * @return the result containing effective unassignments and timestamp, or skipped result
    * @throws AccessDeniedException if the user is not allowed to unassign labels from entities
    */
-  @NotNull
   public UnassignLabelsFromEntitiesResult unassignEntitiesFromLabels(
-      @NotNull UnassignLabelsFromEntitiesRequest request) {
+      UnassignLabelsFromEntitiesRequest request) {
 
     if (request.isEmpty()) {
       return UnassignLabelsFromEntitiesResult.skipped();
