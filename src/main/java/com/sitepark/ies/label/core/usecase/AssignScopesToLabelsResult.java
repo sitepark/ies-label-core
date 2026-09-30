@@ -2,7 +2,6 @@ package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.value.LabelScopeAssignment;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a scope assignment operation.
@@ -25,7 +24,7 @@ public sealed interface AssignScopesToLabelsResult {
    * @param assignments the effective label-scope assignments that were made
    * @param timestamp the timestamp when the assignment occurred
    */
-  record Assigned(@NotNull LabelScopeAssignment assignments, @NotNull Instant timestamp)
+  record Assigned(LabelScopeAssignment assignments, Instant timestamp)
       implements AssignScopesToLabelsResult {}
 
   /** Result when the scope assignment was skipped. */
@@ -38,8 +37,7 @@ public sealed interface AssignScopesToLabelsResult {
    * @param timestamp the assignment timestamp
    * @return assigned result
    */
-  static AssignScopesToLabelsResult assigned(
-      @NotNull LabelScopeAssignment assignments, @NotNull Instant timestamp) {
+  static AssignScopesToLabelsResult assigned(LabelScopeAssignment assignments, Instant timestamp) {
     return new Assigned(assignments, timestamp);
   }
 

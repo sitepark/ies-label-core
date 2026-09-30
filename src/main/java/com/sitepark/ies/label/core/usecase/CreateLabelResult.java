@@ -2,7 +2,6 @@ package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.value.LabelSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a label creation operation.
@@ -16,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * @param timestamp the exact moment when the label was created
  */
 public record CreateLabelResult(
-    @NotNull String labelId,
-    @NotNull LabelSnapshot snapshot,
-    @NotNull AssignScopesToLabelsResult scopeAssignmentResult,
-    @NotNull Instant timestamp) {}
+    String labelId,
+    LabelSnapshot snapshot,
+    AssignScopesToLabelsResult scopeAssignmentResult,
+    Instant timestamp) {}

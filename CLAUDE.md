@@ -11,7 +11,7 @@ between domain logic, use cases, and infrastructure ports.
 
 **Key Technologies:**
 
-- Java 21 (LTS)
+- Java 25
 - Maven 3.8+
 - Jakarta Inject for dependency injection
 - Jackson for JSON serialization
@@ -46,9 +46,6 @@ mvn spotless:apply
 
 # Check code formatting
 mvn spotless:check
-
-# Run SpotBugs static analysis
-mvn spotbugs:check
 
 # Run PMD static analysis
 mvn pmd:check
@@ -427,7 +424,8 @@ exist).
 This project enforces strict code quality:
 
 - **Spotless** with Google Java Style formatting
-- **SpotBugs** for bug pattern detection (configured in `spotbug-exclude-filter.xml`)
+- **Error Prone** and **NullAway** (JSpecify mode) run during compilation; `-Werror` turns every warning into an error
+- Code is `@NullMarked`; nullable points use `org.jspecify.annotations.Nullable`
 - **PMD** for code quality rules (configured in `pmd-ruleset.xml`)
 - **JaCoCo** for code coverage tracking
 

@@ -2,7 +2,6 @@ package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.value.LabelSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a label restore operation.
@@ -20,7 +19,6 @@ public sealed interface RestoreLabelResult {
    *
    * @return the label ID
    */
-  @NotNull
   String labelId();
 
   /**
@@ -30,8 +28,7 @@ public sealed interface RestoreLabelResult {
    * @param snapshot snapshot of the restored label data including scope assignments
    * @param timestamp when the restore occurred
    */
-  record Restored(
-      @NotNull String labelId, @NotNull LabelSnapshot snapshot, @NotNull Instant timestamp)
+  record Restored(String labelId, LabelSnapshot snapshot, Instant timestamp)
       implements RestoreLabelResult {}
 
   /**
@@ -40,7 +37,7 @@ public sealed interface RestoreLabelResult {
    * @param labelId the ID of the label that already exists
    * @param reason explanation why restoration was skipped
    */
-  record Skipped(@NotNull String labelId, @NotNull String reason) implements RestoreLabelResult {}
+  record Skipped(String labelId, String reason) implements RestoreLabelResult {}
 
   /**
    * Factory method for creating a restored result.

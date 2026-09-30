@@ -4,8 +4,6 @@ import com.sitepark.ies.label.core.domain.entity.Label;
 import com.sitepark.ies.sharedkernel.domain.EntityRef;
 import java.util.Collections;
 import java.util.List;
-import javax.annotation.concurrent.Immutable;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Immutable snapshot of a label's state including its scope assignments.
@@ -17,9 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * @param scopes the list of scopes associated with this label
  * @param entityRefs the list of entity references associated with this label
  */
-@Immutable
-public record LabelSnapshot(
-    @NotNull Label label, @NotNull List<String> scopes, @NotNull List<EntityRef> entityRefs) {
+public record LabelSnapshot(Label label, List<String> scopes, List<EntityRef> entityRefs) {
 
   public LabelSnapshot {
     scopes = scopes != null ? List.copyOf(scopes) : Collections.emptyList();

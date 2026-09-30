@@ -11,15 +11,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.NotNull;
 
 @JsonDeserialize(builder = ReassignLabelsToEntitiesRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 public final class ReassignLabelsToEntitiesRequest {
 
-  @NotNull private final List<EntityRef> entityRefs;
+  private final List<EntityRef> entityRefs;
 
-  @NotNull private final List<Identifier> labelIdentifiers;
+  private final List<Identifier> labelIdentifiers;
 
   private ReassignLabelsToEntitiesRequest(Builder builder) {
     this.entityRefs = List.copyOf(builder.entityRefs);

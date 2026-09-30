@@ -2,6 +2,7 @@ package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.entity.Label;
 import com.sitepark.ies.label.core.port.LabelRepository;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import jakarta.inject.Inject;
 
@@ -45,18 +46,19 @@ public class UpsertLabelUseCase {
   }
 
   private Label toLabelWithId(Label label) {
-    if (label.id() == null && label.anchor() != null) {
+    Anchor anchor = label.anchor();
+    if (label.id() == null && anchor != null) {
       return this.repository
-          .resolveAnchor(label.anchor())
+          .resolveAnchor(anchor)
           .map(s -> label.toBuilder().id(s).build())
           .orElse(label);
-    } else if (label.id() != null && label.anchor() != null) {
+    } else if (label.id() != null && anchor != null) {
       this.repository
-          .resolveAnchor(label.anchor())
+          .resolveAnchor(anchor)
           .ifPresent(
               owner -> {
                 if (!owner.equals(label.id())) {
-                  throw new AnchorAlreadyExistsException(label.anchor(), owner);
+                  throw new AnchorAlreadyExistsException(anchor, owner);
                 }
               });
     }

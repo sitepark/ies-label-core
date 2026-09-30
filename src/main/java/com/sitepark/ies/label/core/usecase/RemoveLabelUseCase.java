@@ -15,7 +15,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
+import java.util.Objects;
 
 /**
  * Use case for removing a label.
@@ -59,8 +59,7 @@ public final class RemoveLabelUseCase {
    * @throws AccessDeniedException if the user is not a label manager
    * @throws LabelNotFoundException if the label does not exist
    */
-  @NotNull
-  public RemoveLabelResult removeLabel(@NotNull RemoveLabelRequest request) {
+  public RemoveLabelResult removeLabel(RemoveLabelRequest request) {
 
     if (!this.accessControl.isLabelManagable()) {
       throw new AccessDeniedException("User is not allowed to remove labels.");
@@ -80,7 +79,11 @@ public final class RemoveLabelUseCase {
     // Perform removal
     this.repository.remove(id);
 
-    return RemoveLabelResult.removed(id, label.name(), snapshot, timestamp);
+    return RemoveLabelResult.removed(
+        id,
+        Objects.requireNonNull(label.name(), "label name must not be null"),
+        snapshot,
+        timestamp);
   }
 
   private String resolveIdentifier(Identifier identifier) {

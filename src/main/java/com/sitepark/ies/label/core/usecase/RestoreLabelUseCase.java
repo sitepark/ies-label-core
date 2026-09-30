@@ -6,6 +6,7 @@ import com.sitepark.ies.label.core.port.AuthorizationService;
 import com.sitepark.ies.label.core.port.LabelEntityAssigner;
 import com.sitepark.ies.label.core.port.LabelRepository;
 import com.sitepark.ies.label.core.port.LabelScopeAssigner;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.domain.EntityRef;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
@@ -13,6 +14,7 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,12 +69,12 @@ public final class RestoreLabelUseCase {
 
     this.checkAccessControl(label);
 
-    if (this.repository.get(label.id()).isPresent()) {
+    String labelId = Objects.requireNonNull(label.id(), "label id must not be null");
+    if (this.repository.get(labelId).isPresent()) {
       if (LOGGER.isInfoEnabled()) {
-        LOGGER.info("Skip restore, label with ID {} already exists.", label.id());
+        LOGGER.info("Skip restore, label with ID {} already exists.", labelId);
       }
-      return RestoreLabelResult.skipped(
-          label.id(), "Label with ID " + label.id() + " already exists");
+      return RestoreLabelResult.skipped(labelId, "Label with ID " + labelId + " already exists");
     }
 
     this.validateAnchor(label);
@@ -85,18 +87,15 @@ public final class RestoreLabelUseCase {
 
     LabelSnapshot snapshot = new LabelSnapshot(label, scopeIds, entityRefs);
 
-    String labelId = label.id();
-    assert labelId != null : "label.id() was validated in validateLabel()";
-
     this.repository.restore(label);
     if (!scopeIds.isEmpty()) {
       this.scopeAssigner.assignScopesToLabels(List.of(labelId), scopeIds);
     }
     if (!entityRefs.isEmpty()) {
-      this.entityAssigner.assignEntitiesToLabels(List.of(label.id()), entityRefs);
+      this.entityAssigner.assignEntitiesToLabels(List.of(labelId), entityRefs);
     }
 
-    return RestoreLabelResult.restored(label.id(), snapshot, timestamp);
+    return RestoreLabelResult.restored(labelId, snapshot, timestamp);
   }
 
   private void validateLabel(Label label) {
@@ -115,11 +114,12 @@ public final class RestoreLabelUseCase {
   }
 
   private void validateAnchor(Label label) {
-    if (label.anchor() != null) {
-      Optional<String> anchorOwner = this.repository.resolveAnchor(label.anchor());
+    Anchor anchor = label.anchor();
+    if (anchor != null) {
+      Optional<String> anchorOwner = this.repository.resolveAnchor(anchor);
       anchorOwner.ifPresent(
           owner -> {
-            throw new AnchorAlreadyExistsException(label.anchor(), owner);
+            throw new AnchorAlreadyExistsException(anchor, owner);
           });
     }
   }

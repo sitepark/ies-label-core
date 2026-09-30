@@ -11,16 +11,15 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 @JsonDeserialize(builder = UnassignLabelsFromEntitiesRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 public final class UnassignLabelsFromEntitiesRequest {
 
-  @NotNull private final List<EntityRef> entityRefs;
+  private final List<EntityRef> entityRefs;
 
-  @NotNull private final List<Identifier> labelIdentifiers;
+  private final List<Identifier> labelIdentifiers;
 
   @Nullable private final String auditParentId;
 
@@ -46,7 +45,7 @@ public final class UnassignLabelsFromEntitiesRequest {
     return this.labelIdentifiers;
   }
 
-  public String auditParentId() {
+  public @Nullable String auditParentId() {
     return this.auditParentId;
   }
 
@@ -85,7 +84,7 @@ public final class UnassignLabelsFromEntitiesRequest {
 
     private final Set<EntityRef> entityRefs = new TreeSet<>();
     private final Set<Identifier> labelIdentifiers = new TreeSet<>();
-    private String auditParentId;
+    private @Nullable String auditParentId;
 
     private Builder() {}
 

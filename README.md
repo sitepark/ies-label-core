@@ -263,7 +263,7 @@ AssignEntitiesToLabelsResult assignResult =
 
 ## Dependencies
 
-- **Java 21+** - LTS version required
+- **Java 25** - required
 - **Jakarta Inject** - Dependency injection API
 - **IES Shared Kernel** - Common types (Anchor, Identifier)
 - **Jackson** - JSON serialization support

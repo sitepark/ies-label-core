@@ -11,7 +11,6 @@ import jakarta.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Use case for creating a new label.
@@ -51,8 +50,7 @@ public final class CreateLabelUseCase {
    * @return the result containing label ID, snapshot, and timestamp
    * @throws AccessDeniedException if the user is not a label manager
    */
-  @NotNull
-  public CreateLabelResult createLabel(@NotNull CreateLabelRequest request) {
+  public CreateLabelResult createLabel(CreateLabelRequest request) {
     if (!this.accessControl.isLabelManagable()) {
       throw new AccessDeniedException("User is not allowed to create labels.");
     }

@@ -35,7 +35,6 @@ class UpdateLabelUseCaseTest {
   private LabelRepository repository;
   private LabelScopeAssigner scopeAssigner;
   private AuthorizationService accessControl;
-  private PatchServiceFactory patchServiceFactory;
 
   @SuppressWarnings("unchecked")
   private PatchService<Label> patchService = mock();
@@ -47,17 +46,13 @@ class UpdateLabelUseCaseTest {
     this.repository = mock();
     this.scopeAssigner = mock();
     this.accessControl = mock();
-    this.patchServiceFactory = mock();
+    PatchServiceFactory patchServiceFactory = mock();
     this.patchService = mock();
-    when(this.patchServiceFactory.createPatchService(Label.class)).thenReturn(this.patchService);
+    when(patchServiceFactory.createPatchService(Label.class)).thenReturn(this.patchService);
     Clock clock = Clock.fixed(Instant.parse("2024-01-01T00:00:00Z"), ZoneId.of("UTC"));
     this.useCase =
         new UpdateLabelUseCase(
-            this.repository,
-            this.scopeAssigner,
-            this.accessControl,
-            this.patchServiceFactory,
-            clock);
+            this.repository, this.scopeAssigner, this.accessControl, patchServiceFactory, clock);
   }
 
   @Test

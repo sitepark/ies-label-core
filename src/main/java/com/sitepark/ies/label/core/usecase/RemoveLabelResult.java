@@ -2,8 +2,7 @@ package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.value.LabelSnapshot;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a label removal operation.
@@ -25,7 +24,6 @@ public sealed interface RemoveLabelResult {
    *
    * @return the label ID
    */
-  @NotNull
   String labelId();
 
   /**
@@ -36,11 +34,7 @@ public sealed interface RemoveLabelResult {
    * @param snapshot the complete snapshot of the label before removal (for audit logging)
    * @param timestamp the exact moment when the removal occurred
    */
-  record Removed(
-      @NotNull String labelId,
-      @NotNull String labelName,
-      @NotNull LabelSnapshot snapshot,
-      @NotNull Instant timestamp)
+  record Removed(String labelId, String labelName, LabelSnapshot snapshot, Instant timestamp)
       implements RemoveLabelResult {}
 
   /**
@@ -49,7 +43,7 @@ public sealed interface RemoveLabelResult {
    * @param labelId the ID of the label that was not removed
    * @param reason the reason why the removal was skipped
    */
-  record Skipped(@NotNull String labelId, @NotNull String reason) implements RemoveLabelResult {}
+  record Skipped(String labelId, String reason) implements RemoveLabelResult {}
 
   /**
    * Factory method to create a Removed result.
@@ -61,10 +55,7 @@ public sealed interface RemoveLabelResult {
    * @return a Removed result
    */
   static RemoveLabelResult removed(
-      @NotNull String labelId,
-      @NotNull String labelName,
-      @NotNull LabelSnapshot snapshot,
-      @NotNull Instant timestamp) {
+      String labelId, String labelName, LabelSnapshot snapshot, Instant timestamp) {
     return new Removed(labelId, labelName, snapshot, timestamp);
   }
 
@@ -75,7 +66,7 @@ public sealed interface RemoveLabelResult {
    * @param reason the reason for skipping
    * @return a Skipped result
    */
-  static RemoveLabelResult skipped(@NotNull String labelId, @NotNull String reason) {
+  static RemoveLabelResult skipped(String labelId, String reason) {
     return new Skipped(labelId, reason);
   }
 

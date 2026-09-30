@@ -2,7 +2,6 @@ package com.sitepark.ies.label.core.usecase;
 
 import com.sitepark.ies.label.core.domain.value.EntityLabelAssignment;
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Result of a label assignment operation.
@@ -26,9 +25,7 @@ public sealed interface ReassignLabelsToEntitiesResult {
    * @param timestamp the timestamp when the assignment occurred
    */
   record Reassigned(
-      @NotNull EntityLabelAssignment assignments,
-      @NotNull EntityLabelAssignment unassignments,
-      @NotNull Instant timestamp)
+      EntityLabelAssignment assignments, EntityLabelAssignment unassignments, Instant timestamp)
       implements ReassignLabelsToEntitiesResult {}
 
   /** Result when the label assignment was skipped. */
@@ -42,9 +39,7 @@ public sealed interface ReassignLabelsToEntitiesResult {
    * @return assigned result
    */
   static ReassignLabelsToEntitiesResult reassigned(
-      @NotNull EntityLabelAssignment assignments,
-      @NotNull EntityLabelAssignment unassignments,
-      @NotNull Instant timestamp) {
+      EntityLabelAssignment assignments, EntityLabelAssignment unassignments, Instant timestamp) {
     return new Reassigned(assignments, unassignments, timestamp);
   }
 

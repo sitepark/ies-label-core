@@ -1,7 +1,7 @@
 package com.sitepark.ies.label.core.usecase;
 
 import java.time.Instant;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Result of a label update operation.
@@ -17,10 +17,10 @@ import org.jetbrains.annotations.NotNull;
  * </ul>
  */
 public record UpdateLabelResult(
-    @NotNull String labelId,
-    @NotNull Instant timestamp,
-    @NotNull LabelUpdateResult labelResult,
-    @NotNull ReassignScopesToLabelsResult scopeReassignmentResult) {
+    String labelId,
+    Instant timestamp,
+    LabelUpdateResult labelResult,
+    ReassignScopesToLabelsResult scopeReassignmentResult) {
 
   /**
    * Checks if the label data was changed.
@@ -54,7 +54,7 @@ public record UpdateLabelResult(
    *
    * @return the Updated result or null if unchanged
    */
-  public LabelUpdateResult.Updated getLabelUpdate() {
+  public LabelUpdateResult.@Nullable Updated getLabelUpdate() {
     return labelResult instanceof LabelUpdateResult.Updated updated ? updated : null;
   }
 
@@ -63,7 +63,7 @@ public record UpdateLabelResult(
    *
    * @return the Assigned result or null if skipped
    */
-  public ReassignScopesToLabelsResult.Reassigned getScopeReassignment() {
+  public ReassignScopesToLabelsResult.@Nullable Reassigned getScopeReassignment() {
     return scopeReassignmentResult instanceof ReassignScopesToLabelsResult.Reassigned reassigned
         ? reassigned
         : null;
