@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jparams.verifier.tostring.ToStringVerifier;
+import com.sitepark.ies.label.core.domain.exception.InvalidColorException;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import nl.jqno.equalsverifier.EqualsVerifier;
@@ -64,12 +65,17 @@ class LabelTest {
     assertNull(label.color(), "Null color should be stored as null");
   }
 
+  private InvalidColorException expectInvalidColor(String color) {
+    return assertThrows(
+        InvalidColorException.class,
+        () -> Label.builder().color(color),
+        "Invalid hex color should throw InvalidColorException");
+  }
+
   @Test
   void testBuildColorWithInvalidFormatThrows() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> Label.builder().color("ZZZZZZ"),
-        "Invalid hex color should throw IllegalArgumentException");
+    InvalidColorException exception = this.expectInvalidColor("ZZZZZZ");
+    assertEquals("ZZZZZZ", exception.getColor(), "Exception should carry the invalid color");
   }
 
   @Test

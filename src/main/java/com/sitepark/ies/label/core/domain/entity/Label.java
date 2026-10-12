@@ -3,6 +3,7 @@ package com.sitepark.ies.label.core.domain.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.sitepark.ies.label.core.domain.exception.InvalidColorException;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import java.util.Locale;
@@ -16,6 +17,8 @@ import org.jspecify.annotations.Nullable;
   "PMD.AvoidFieldNameMatchingMethodName" // record-style accessors share the field name
 })
 public final class Label {
+
+  private static final Pattern COLOR_VALIDATOR = Pattern.compile("^[0-9a-fA-F]{6}$");
 
   private final @Nullable String id;
   private final @Nullable Anchor anchor;
@@ -118,8 +121,6 @@ public final class Label {
     private @Nullable String color;
     private @Nullable String description;
 
-    private final Pattern COLOR_VALIDATOR = Pattern.compile("^[0-9a-fA-F]{6}$");
-
     public Builder() {}
 
     public Builder(Label label) {
@@ -156,7 +157,7 @@ public final class Label {
         return this;
       }
       if (!COLOR_VALIDATOR.matcher(color).matches()) {
-        throw new IllegalArgumentException("Invalid color: " + color);
+        throw new InvalidColorException(color);
       }
       this.color = color.toLowerCase(Locale.ROOT);
       return this;
