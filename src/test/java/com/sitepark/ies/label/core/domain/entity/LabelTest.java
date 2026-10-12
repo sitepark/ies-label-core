@@ -88,6 +88,16 @@ class LabelTest {
   }
 
   @Test
+  void testToBuilderKeepsAnchor() {
+    Label original = Label.builder().id("1").anchor("my-anchor").name("Original").build();
+    Label copy = original.toBuilder().build();
+    assertEquals(
+        Anchor.ofString("my-anchor"),
+        copy.anchor(),
+        "toBuilder should keep the anchor of the label");
+  }
+
+  @Test
   void testToIdentifierReturnsIdWhenIdIsSet() {
     Label label = Label.builder().id("1").build();
     assertEquals(

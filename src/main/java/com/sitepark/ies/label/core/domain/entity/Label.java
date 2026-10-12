@@ -124,6 +124,7 @@ public final class Label {
 
     public Builder(Label label) {
       this.id = label.id;
+      this.anchor = label.anchor;
       this.name = label.name;
       this.color = label.color;
       this.description = label.description;
