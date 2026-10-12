@@ -67,8 +67,7 @@ public final class UpdateLabelUseCase {
     Label oldLabel =
         this.repository
             .get(Objects.requireNonNull(newLabel.id(), "label id must not be null"))
-            .orElseThrow(
-                () -> new LabelNotFoundException("No label with ID " + newLabel.id() + " found."))
+            .orElseThrow(() -> new LabelNotFoundException(Objects.requireNonNull(newLabel.id())))
             .toBuilder()
             .build();
 

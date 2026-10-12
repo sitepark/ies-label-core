@@ -1,5 +1,6 @@
 package com.sitepark.ies.label.core.usecase;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -65,15 +66,20 @@ class UpdateLabelUseCaseTest {
         "Should throw AccessDeniedException when user is not a label manager");
   }
 
+  private LabelNotFoundException expectLabelNotFound(UpdateLabelRequest request) {
+    return assertThrows(
+        LabelNotFoundException.class,
+        () -> this.useCase.updateLabel(request),
+        "Should throw LabelNotFoundException when label does not exist");
+  }
+
   @Test
   void testUpdateLabelThrowsWhenLabelNotFound() {
     when(this.accessControl.isLabelManagable()).thenReturn(true);
     when(this.repository.get(LABEL_ID)).thenReturn(Optional.empty());
     UpdateLabelRequest request = UpdateLabelRequest.builder().label(UPDATED_LABEL).build();
-    assertThrows(
-        LabelNotFoundException.class,
-        () -> this.useCase.updateLabel(request),
-        "Should throw LabelNotFoundException when label does not exist");
+    LabelNotFoundException exception = this.expectLabelNotFound(request);
+    assertEquals(LABEL_ID, exception.getId(), "Exception should carry the id of the missing label");
   }
 
   @Test
