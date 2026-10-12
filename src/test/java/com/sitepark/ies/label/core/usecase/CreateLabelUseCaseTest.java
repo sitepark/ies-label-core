@@ -12,6 +12,7 @@ import com.sitepark.ies.label.core.domain.entity.Label;
 import com.sitepark.ies.label.core.port.AuthorizationService;
 import com.sitepark.ies.label.core.port.LabelRepository;
 import com.sitepark.ies.label.core.port.LabelScopeAssigner;
+import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import java.time.Clock;
 import java.time.Instant;
@@ -51,6 +52,45 @@ class CreateLabelUseCaseTest {
         AccessDeniedException.class,
         () -> this.useCase.createLabel(request),
         "Should throw AccessDeniedException when user is not a label manager");
+  }
+
+  @Test
+  void testCreateLabelWithFreeAnchorCreatesLabel() {
+    Label label = Label.builder().name("Test Label").anchor("my-anchor").build();
+    when(this.accessControl.isLabelManagable()).thenReturn(true);
+    when(this.repository.resolveAnchor(label.anchor())).thenReturn(Optional.empty());
+    when(this.repository.create(any())).thenReturn(LABEL_ID);
+    when(this.repository.get(LABEL_ID)).thenReturn(Optional.of(label));
+
+    this.useCase.createLabel(CreateLabelRequest.builder().label(label).build());
+
+    verify(this.repository).create(label);
+  }
+
+  @Test
+  void testCreateLabelWithTakenAnchorThrows() {
+    Label label = Label.builder().name("Test Label").anchor("my-anchor").build();
+    when(this.accessControl.isLabelManagable()).thenReturn(true);
+    when(this.repository.resolveAnchor(label.anchor())).thenReturn(Optional.of("7"));
+    when(this.repository.create(any()))
+        .thenThrow(new IllegalStateException("label must not be created"));
+    CreateLabelRequest request = CreateLabelRequest.builder().label(label).build();
+
+    assertThrows(
+        AnchorAlreadyExistsException.class,
+        () -> this.useCase.createLabel(request),
+        "Should throw AnchorAlreadyExistsException without creating the label");
+  }
+
+  @Test
+  void testCreateLabelWithoutAnchorDoesNotResolveAnchor() {
+    when(this.accessControl.isLabelManagable()).thenReturn(true);
+    when(this.repository.create(any())).thenReturn(LABEL_ID);
+    when(this.repository.get(LABEL_ID)).thenReturn(Optional.of(TEST_LABEL));
+
+    this.useCase.createLabel(CreateLabelRequest.builder().label(TEST_LABEL).build());
+
+    verify(this.repository, never()).resolveAnchor(any());
   }
 
   @Test

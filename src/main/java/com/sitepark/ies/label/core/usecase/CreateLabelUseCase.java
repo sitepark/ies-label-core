@@ -6,6 +6,8 @@ import com.sitepark.ies.label.core.domain.value.LabelSnapshot;
 import com.sitepark.ies.label.core.port.AuthorizationService;
 import com.sitepark.ies.label.core.port.LabelRepository;
 import com.sitepark.ies.label.core.port.LabelScopeAssigner;
+import com.sitepark.ies.sharedkernel.anchor.Anchor;
+import com.sitepark.ies.sharedkernel.anchor.AnchorAlreadyExistsException;
 import com.sitepark.ies.sharedkernel.security.AccessDeniedException;
 import jakarta.inject.Inject;
 import java.time.Clock;
@@ -49,11 +51,14 @@ public final class CreateLabelUseCase {
    * @param request the label creation request containing the label and scope IDs
    * @return the result containing label ID, snapshot, and timestamp
    * @throws AccessDeniedException if the user is not a label manager
+   * @throws AnchorAlreadyExistsException if the anchor of the label is already taken
    */
   public CreateLabelResult createLabel(CreateLabelRequest request) {
     if (!this.accessControl.isLabelManagable()) {
       throw new AccessDeniedException("User is not allowed to create labels.");
     }
+
+    this.validateAnchor(request.label());
 
     Instant timestamp = Instant.now(this.clock);
     String labelId = this.repository.create(request.label());
@@ -74,5 +79,18 @@ public final class CreateLabelUseCase {
     LabelSnapshot snapshot = new LabelSnapshot(createdLabel, scopeIds, List.of());
 
     return new CreateLabelResult(labelId, snapshot, scopeReassignmentResult, timestamp);
+  }
+
+  private void validateAnchor(Label label) {
+    Anchor anchor = label.anchor();
+    if (anchor == null) {
+      return;
+    }
+    this.repository
+        .resolveAnchor(anchor)
+        .ifPresent(
+            owner -> {
+              throw new AnchorAlreadyExistsException(anchor, owner);
+            });
   }
 }
