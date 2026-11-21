@@ -1,7 +1,5 @@
 package com.sitepark.ies.label.core.usecase;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import com.sitepark.ies.sharedkernel.base.IdentifierListBuilder;
 import com.sitepark.ies.sharedkernel.base.ListBuilder;
@@ -13,7 +11,6 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 
-@JsonDeserialize(builder = UnassignLabelsFromEntitiesRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName"})
 public final class UnassignLabelsFromEntitiesRequest {
 
@@ -79,7 +76,6 @@ public final class UnassignLabelsFromEntitiesRequest {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
 
     private final Set<EntityRef> entityRefs = new TreeSet<>();

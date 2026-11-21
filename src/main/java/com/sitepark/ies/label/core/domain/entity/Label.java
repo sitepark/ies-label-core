@@ -1,8 +1,6 @@
 package com.sitepark.ies.label.core.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.label.core.domain.exception.InvalidColorException;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
@@ -11,7 +9,6 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import org.jspecify.annotations.Nullable;
 
-@JsonDeserialize(builder = Label.Builder.class)
 @SuppressWarnings({
   "PMD.TooManyMethods", // value class: record-style accessors plus equals/hashCode/toString
   "PMD.AvoidFieldNameMatchingMethodName" // record-style accessors share the field name
@@ -113,7 +110,6 @@ public final class Label {
         + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   public static final class Builder {
     private @Nullable String id;
     private @Nullable Anchor anchor;
