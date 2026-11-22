@@ -1,7 +1,5 @@
 package com.sitepark.ies.label.core.usecase;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.sitepark.ies.label.core.domain.entity.Label;
 import com.sitepark.ies.sharedkernel.base.ListBuilder;
 import java.util.List;
@@ -10,7 +8,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 
-@JsonDeserialize(builder = CreateLabelRequest.Builder.class)
 @SuppressWarnings({"PMD.AvoidFieldNameMatchingMethodName", "PMD.LawOfDemeter"})
 public final class CreateLabelRequest {
 
@@ -56,7 +53,6 @@ public final class CreateLabelRequest {
     return "CreateUserRequest{" + "label=" + label + ", scopes=" + scopes + '}';
   }
 
-  @JsonPOJOBuilder(withPrefix = "")
   @SuppressWarnings("NullAway.Init") // label is set via fluent setter and validated in build()
   public static final class Builder {
 

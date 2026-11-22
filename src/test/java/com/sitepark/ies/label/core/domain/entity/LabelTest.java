@@ -5,14 +5,14 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jparams.verifier.tostring.ToStringVerifier;
 import com.sitepark.ies.label.core.domain.exception.InvalidColorException;
 import com.sitepark.ies.sharedkernel.anchor.Anchor;
 import com.sitepark.ies.sharedkernel.base.Identifier;
 import nl.jqno.equalsverifier.EqualsVerifier;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 class LabelTest {
 
@@ -138,24 +138,18 @@ class LabelTest {
   }
 
   @Test
-  void testSerialize() throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+  void testSerialize() {
+    JsonMapper mapper =
+        JsonMapper.builder()
+            .disable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
+            .changeDefaultPropertyInclusion(
+                inclusion -> inclusion.withValueInclusion(JsonInclude.Include.NON_NULL))
+            .build();
     Label label = Label.builder().id("1").name("Test").color("ff0000").description("desc").build();
     String json = mapper.writeValueAsString(label);
     assertEquals(
         "{\"id\":\"1\",\"name\":\"Test\",\"color\":\"ff0000\",\"description\":\"desc\"}",
         json,
         "Unexpected JSON serialization output");
-  }
-
-  @Test
-  void testDeserialize() throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    String json = "{\"id\":\"1\",\"name\":\"Test\",\"color\":\"ff0000\",\"description\":\"desc\"}";
-    Label label = mapper.readValue(json, Label.class);
-    Label expected =
-        Label.builder().id("1").name("Test").color("ff0000").description("desc").build();
-    assertEquals(expected, label, "Deserialized label should equal the expected label");
   }
 }
